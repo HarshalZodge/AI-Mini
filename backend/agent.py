@@ -58,27 +58,27 @@ if GEMINI_API_KEY and GEMINI_API_KEY != "your_gemini_api_key_here":
 # SECTION 1: SYSTEM PROMPT & FUNCTION DEFINITIONS
 # =============================================================================
 SYSTEM_PROMPT = """You are CivicResolve, an empathetic, highly competent, and polite AI Civic Grievance Redressal Agent for Ahilyanagar Municipal Corporation (AMC).
-Your mission is to help citizens register, structure, and track municipal complaints smoothly.
+Your mission is to help citizens register, structure, and track municipal complaints smoothly through interactive dialogue.
 
 Languages:
 - You must reply in the language the citizen uses (English, Hindi, or Marathi). Keep your tone respectful, supportive, and civic-minded.
 
-Core Guidelines:
-1. Active Listening & Clarification:
-   - If the user provides sufficient details (issue and location), proceed immediately with tool use.
-   - If the issue description is very vague or lacks location/neighborhood in Ahilyanagar, ask AT MOST 1 or 2 brief, polite follow-up questions (e.g. asking for the exact area/landmark like Savedi, Kedgaon, Bhingar, Tarakpur, or how long the issue has persisted). Never interrogate or ask more than 2 follow-ups.
-2. Tool Execution Workflow:
-   - When an issue and location are identified, call the following tools:
-     a) classify_complaint: determine standard category and sub-issue.
-     b) find_department: match to official AMC department and SLA (never invent authority names).
-     c) score_priority: compute 1-5 severity based on hazards (open manholes, live wires, hospitals, traffic).
-     d) check_duplicates: check if nearby citizens have already reported this issue.
-     e) generate_formal_letter: draft a polite, rigorous official letter to the authority.
-3. Handling Duplicates:
-   - If check_duplicates finds existing active complaints nearby, notify the user: "N citizens have already reported this nearby" and present the option to upvote the existing ticket or file a new one.
-4. Summary & Confirmation:
-   - Once the draft letter, category, department, and priority are ready, show a concise confirmation summary and ask if they would like to submit it.
-5. Submission:
+Core Conversational Workflow:
+1. Turn 1 (Initial Report - Active Inquiry & Clarification):
+   - When a citizen first reports an issue, invoke classify_complaint_tool and find_department_tool to acknowledge the problem.
+   - Do NOT prepare the final petition immediately. Instead, ask 1 or 2 polite, concise clarifying questions in the citizen's language to gather essential details:
+     a) Exact landmark or street in Ahilyanagar (e.g., near which chowk, shop, or building in Savedi, Kedgaon, Bhingar, Tarakpur, Delhi Gate, etc.).
+     b) Duration & Severity: How long the issue has persisted and whether it poses an immediate hazard (e.g., accidents, waterlogging, foul stench, dark street, contamination).
+   - Only skip questions if the citizen's very first message ALREADY includes an exhaustive report with exact landmark, duration, AND hazard impact.
+
+2. Turn 2 (Formulation after Clarification):
+   - When the citizen answers your questions, invoke:
+     a) score_priority_tool: compute 1-5 severity incorporating the hazard and duration details.
+     b) check_duplicates: check if nearby citizens have already reported this issue.
+     c) generate_formal_letter: draft a polite, rigorous official letter to the authority.
+   - Present a concise confirmation summary and ask if they would like to submit it.
+
+3. Turn 3 (Submission upon Confirmation):
    - When the user confirms (e.g., "Yes", "Submit", "Proceed", "हो", "हाँ", "कर दो"), invoke submit_complaint to record the grievance and provide the tracking ID.
 """
 
@@ -114,6 +114,123 @@ def is_confirmation_intent(text: str) -> bool:
     return any(p in t for p in positive_words) or t == "y"
 
 
+def is_greeting_intent(text: str) -> bool:
+    """Detects if user is merely greeting rather than reporting an issue."""
+    t = text.strip().lower()
+    greetings = ["hi", "hello", "hey", "namaste", "namaskar", "pranam", "good morning", "good evening", "shubh prabhat", "kem cho"]
+    return t in greetings or t in [g + "!" for g in greetings] or t in [g + "." for g in greetings]
+
+
+def is_initial_turn(history: List[Any]) -> bool:
+    """Checks if this is the citizen's first problem reporting message (ignoring pure greetings)."""
+    substantive_user_turns = []
+    for h in history:
+        content = ""
+        role = ""
+        if isinstance(h, dict):
+            role = h.get("role", "")
+            content = h.get("content", "")
+        elif hasattr(h, "role"):
+            role = getattr(h, "role", "")
+            content = getattr(h, "content", "")
+        if role in ["user", "human"] and content:
+            if not is_greeting_intent(content):
+                substantive_user_turns.append(content)
+    return len(substantive_user_turns) == 0
+
+
+def check_has_exhaustive_details(text: str, detected_loc: Optional[str]) -> bool:
+    """Checks if citizen provided both landmark and duration/hazard in their first message."""
+    t = text.lower()
+    has_landmark = any(k in t for k in ["near", "opposite", "behind", "chowk", "pillar", "gate", "shop", "signal", "colony", "lane", "galli", "corner", "road", "cross"])
+    has_duration_or_hazard = any(k in t for k in ["since", "day", "week", "month", "hour", "yesterday", "morning", "skid", "accident", "overflow", "stinking", "dark", "sparking", "fall", "injury", "hazard", "leaking", "burst", "urgent"])
+    return bool(detected_loc and has_landmark and has_duration_or_hazard and len(text.split()) >= 25)
+
+
+def generate_clarifying_questions(user_text: str, category: str, dept_name: str, detected_loc: Optional[str]) -> str:
+    """Generates empathetic, context-aware clarifying questions in user's language."""
+    is_devanagari = any('\u0900' <= char <= '\u097f' for char in user_text)
+    marathi_markers = ["आहे", "नाही", "खड्डा", "पाणी", "कचरा", "रस्ता", "लाईट", "चालू", "करा", "सांगा", "का", "झाले", "येथे", "होत", "माझे", "द्या"]
+    is_marathi = is_devanagari and any(w in user_text for w in marathi_markers)
+    is_hindi = is_devanagari and not is_marathi
+
+    loc_str = f"'{detected_loc}'" if detected_loc else "अहिल्यानगर"
+    loc_str_en = f"around **{detected_loc}**" if detected_loc else "in **Ahilyanagar**"
+
+    if is_marathi:
+        if category == "Roads & Potholes":
+            q1 = f"१. **नेमका रस्ता / लँडमार्क**: {loc_str} मध्ये नेमक्या कोणत्या चौकाजवळ, दुकानाजवळ किंवा रस्त्यावर हा खड्डा/रस्ता खराब झाला आहे?"
+            q2 = "२. **कालावधी व धोका**: ही समस्या किती दिवसांपासून आहे, आणि यामुळे दुचाकी घसरणे किंवा अपघाताचा धोका निर्माण झाला आहे का?"
+        elif category == "Water Supply":
+            q1 = f"१. **सोसायटी / गल्ली क्रमांक**: {loc_str} मधील नेमकी कोणती गल्ली किंवा परिसर प्रभावित आहे?"
+            q2 = "२. **समस्येचे स्वरूप**: पाणीपुरवठा पूर्णपणे बंद आहे, कमी दाबाने येतोय की दूषित पाणी येत आहे, आणि किती दिवसांपासून?"
+        elif category == "Sanitation & Garbage":
+            q1 = f"१. **कचरा साचण्याचे ठिकाण**: {loc_str} मध्ये नेमका कचरा कुठे साचला आहे (जवळचा लँडमार्क किंवा रस्ता सांगावा)?"
+            q2 = "२. **कालावधी**: कचरा वेळेवर उचलला न गेल्यामुळे दुर्गंधी किंवा भटक्या प्राण्यांचा उपद्रव वाढला आहे का?"
+        elif category == "Electricity & Streetlights":
+            q1 = f"१. **खांब क्रमांक / अचूक रस्ता**: {loc_str} मध्ये कोणत्या पोलवरील दिवे बंद आहेत किंवा जवळील लँडमार्क कोणता?"
+            q2 = "२. **धोका**: कोणतीही उघडी जिवंत वायर (Live Wire) किंवा रात्री अंधारामुळे अपघाताचा धोका आहे का?"
+        else:
+            q1 = f"१. **नेमके ठिकाण**: {loc_str} मधील जवळचा लँडमार्क, चौक किंवा पत्ता काय आहे?"
+            q2 = "२. **कालावधी व परिणाम**: ही अडचण किती दिवसांपासून आहे आणि नागरिकांवर काय परिणाम होत आहे?"
+
+        return (
+            f"मी आपली **{category}** बाबतची तक्रार समजून घेतली आहे आणि ती **{dept_name}** कडे वर्ग करत आहे.\n\n"
+            f"अहिल्यानगर मनपाच्या क्षेत्रीय अधिकाऱ्यांना थेट जागेवर पोहोचून जलद निराकरण करता यावे यासाठी, कृपया खालील २ बाबी सांगाव्या:\n"
+            f"{q1}\n"
+            f"{q2}\n\n"
+            f"*(आपण थोडक्यात उत्तर दिले तरी मी लगेच आपली अधिकृत तक्रार याचिका तयार करेन.)*"
+        )
+
+    elif is_hindi:
+        if category == "Roads & Potholes":
+            q1 = f"1. **सटीक सड़क / लैंडमार्क**: {loc_str} में किस विशेष चौक, मोड़ या दुकान के पास सड़क क्षतिग्रस्त है?"
+            q2 = "2. **अवधि और जोखिम**: यह समस्या कितने दिनों से है, और क्या इससे दोपहिया वाहनों के फिसलने या दुर्घटना का खतरा है?"
+        elif category == "Water Supply":
+            q1 = f"1. **सटीक मोहल्ला / लेन**: {loc_str} में कौन सा क्षेत्र या गली मुख्य रूप से प्रभावित है?"
+            q2 = "2. **समस्या का प्रकार**: क्या गंदा पानी आ रहा है या दबाव कम है, और यह कब से हो रहा है?"
+        else:
+            q1 = f"1. **सटीक स्थान / लैंडमार्क**: {loc_str} में निकटतम चौक, दुकान या सड़क का नाम क्या है?"
+            q2 = "2. **अवधि व प्रभाव**: यह समस्या कितने दिनों से बनी हुई है और स्थानीय निवासियों पर क्या असर पड़ रहा है?"
+
+        return (
+            f"मैंने आपकी समस्या को **{category}** के अंतर्गत **{dept_name}** हेतु दर्ज करने के लिए नोट कर लिया है।\n\n"
+            f"अहिल्यानगर मनपा टीम द्वारा सटीक फील्ड निरीक्षण और त्वरित कार्य आदेश जारी करने के लिए, कृपया बताएं:\n"
+            f"{q1}\n"
+            f"{q2}\n\n"
+            f"*(आपके संक्षिप्त उत्तर के तुरंत बाद मैं आपकी आधिकारिक याचिका तैयार कर दूंगा।)*"
+        )
+
+    else:
+        # English
+        if category == "Roads & Potholes":
+            q1 = f"1. **Specific Landmark / Junction**: Near which chowk, shop, or building {loc_str_en} is the damaged road or pothole located?"
+            q2 = "2. **Hazard Severity & Duration**: Since how many days has this persisted, and has it caused two-wheeler skids, vehicle damage, or traffic congestion?"
+        elif category == "Water Supply":
+            q1 = f"1. **Affected Lane / Landmark**: Which specific colony, lane, or apartment complex {loc_str_en} is facing the water issue?"
+            q2 = "2. **Issue Specifics**: Is there low pressure, muddy/contaminated supply, or a burst underground pipeline, and since when?"
+        elif category == "Sanitation & Garbage":
+            q1 = f"1. **Dumping Location**: Near which landmark or street {loc_str_en} has the waste accumulated?"
+            q2 = "2. **Duration & Public Health**: How long has it remained uncollected, and is it attracting stray animals or causing foul odor?"
+        elif category == "Electricity & Streetlights":
+            q1 = f"1. **Street & Pole Landmark**: Which stretch or pole number {loc_str_en} is non-functional?"
+            q2 = "2. **Safety Risk**: Is there any exposed live wire, sparking, or severe pedestrian darkness at night?"
+        elif category == "Drainage & Sewage":
+            q1 = f"1. **Exact Location**: Where is the sewage or drainage overflowing {loc_str_en}?"
+            q2 = "2. **Severity**: Is the dirty water entering residential gates or causing a severe health hazard?"
+        else:
+            q1 = f"1. **Exact Landmark / Address**: Near which chowk or landmark {loc_str_en} is this situated?"
+            q2 = "2. **Duration & Impact**: How long has this issue persisted, and what is the primary impact on residents?"
+
+        return (
+            f"I have noted your grievance under **{category}** for the **{dept_name}**.\n\n"
+            f"To help Ahilyanagar Municipal Corporation field engineers dispatch the correct repair squad, could you please share:\n"
+            f"{q1}\n"
+            f"{q2}\n\n"
+            f"*(Once you reply, I will immediately draft your formal Citizen Charter grievance petition.)*"
+        )
+
+
 def extract_location(text: str, history: List[Any]) -> Optional[str]:
     """Finds Ahilyanagar neighborhood in text or history."""
     history_texts = []
@@ -123,12 +240,24 @@ def extract_location(text: str, history: List[Any]) -> Optional[str]:
         elif hasattr(h, "content"):
             history_texts.append(h.content)
     all_text = " ".join(history_texts + [text]).lower()
+    matches = []
     for hood in tools.AHILYANAGAR_NEIGHBORHOODS.keys():
         if hood in all_text:
-            return hood.title()
+            matches.append(hood.title())
+    if matches:
+        # Sort by length descending so longer/more specific names come first
+        matches.sort(key=len, reverse=True)
+        # Filter out matches that are substrings of longer matches
+        unique_matches = []
+        for m in matches:
+            if not any(m.lower() != u.lower() and m.lower() in u.lower() for u in unique_matches):
+                unique_matches.append(m)
+        if len(unique_matches) > 1:
+            return f"{unique_matches[0]}, {unique_matches[1]}"
+        return unique_matches[0]
     # Check for general location patterns like "near X", "at X", "in X"
     import re
-    match = re.search(r'(?:in|near|at|opposite|behind|road|chowk|galli)\s+([A-Za-z0-9\s]{3,20})', text, re.IGNORECASE)
+    match = re.search(r'(?:in|near|at|opposite|behind|road|chowk|galli)\s+([A-Za-z0-9\s]{3,20})', all_text, re.IGNORECASE)
     if match:
         return match.group(1).strip()
     return None
@@ -163,21 +292,107 @@ class CivicAgent:
         agent_steps: List[AgentStep] = []
         user_msg_lower = user_message.lower()
 
-        # Step A: Check if this turn is a confirmation of an existing draft
+        # Step 0: Greeting check
+        if is_greeting_intent(user_message):
+            return {
+                "reply": "Namaste! I am **CivicResolve**, your AI civic redressal agent for Ahilyanagar Municipal Corporation (AMC).\n\nPlease describe the civic grievance you would like to report (e.g., potholes, garbage overflow, water supply disruption, broken streetlights, or drainage issues) and mention your locality in Ahilyanagar.",
+                "agent_steps": [],
+                "complaint_draft": None,
+                "submitted_complaint": None,
+                "duplicate_found": None,
+                "needs_confirmation": False,
+                "ready_for_submission": False,
+            }
+
+        # Step A: Check if this turn is a confirmation of an existing prepared draft
         last_bot_msg = ""
         for h in reversed(history):
             if h.get("role") in ["assistant", "model"]:
                 last_bot_msg = h.get("content", "")
                 break
 
-        confirmation_triggers = ["confirm", "summary", "draft", "submit", "letter", "file", "proceed", "review", "notice", "grievance", "complaint"]
-        has_pending_confirmation = (len(history) >= 2) and (any(k in last_bot_msg.lower() for k in confirmation_triggers) or len(history) >= 2)
+        draft_ready_markers = [
+            "summary card", "formal letter below", "ready for submission", "proceed to submit",
+            "prepared your formal", "review the summary", "तक्रार याचिका", "याचिका तयार",
+            "formal grievance letter below", "would you like me to submit", "should i proceed to submit",
+            "formulated your formal grievance"
+        ]
+        has_pending_confirmation = any(k in last_bot_msg.lower() for k in draft_ready_markers)
 
         # Check if user confirms
         if has_pending_confirmation and is_confirmation_intent(user_message):
             return self._handle_submission_flow(history, user_message, agent_steps)
 
-        # Step B: If Gemini client is active, try Gemini Function Calling
+        # Step B: Check if this is Turn 1 (new report requiring active questions)
+        detected_loc = location_hint or extract_location(user_message, history)
+        first_turn = is_initial_turn(history)
+
+        if first_turn and not check_has_exhaustive_details(user_message, detected_loc):
+            cls = tools.classify_complaint(user_message)
+            category = cls["category"]
+            sub_issue = cls["sub_issue"]
+            dept_info = tools.find_department(category)
+
+            agent_steps.append(AgentStep(
+                step_name="Civic Categorization",
+                tool_name="classify_complaint",
+                status="completed",
+                details=cls,
+                summary=f"Classified as '{category}' ({sub_issue})"
+            ))
+            agent_steps.append(AgentStep(
+                step_name="Department Routing",
+                tool_name="find_department",
+                status="completed",
+                details=dept_info,
+                summary=f"Matched to {dept_info['department_name']} (SLA: {dept_info['expected_resolution_days']} days)"
+            ))
+            agent_steps.append(AgentStep(
+                step_name="Slot Completeness Audit",
+                tool_name="evaluate_completeness",
+                status="completed",
+                details={"missing": ["exact_landmark", "duration_and_hazard"]},
+                summary=f"Identified {category}. Requesting exact landmark & hazard duration for accurate ward assignment."
+            ))
+
+            clarifying_reply = None
+            if genai_client:
+                try:
+                    from google.genai import types
+                    inquiry_prompt = (
+                        f"System Context: {SYSTEM_PROMPT}\n\n"
+                        f"USER: {user_message}\n\n"
+                        f"[Context: Identified Category='{category}', Department='{dept_info['department_name']}', Detected Area='{detected_loc or 'Ahilyanagar'}']\n"
+                        f"Task: Acknowledge the citizen's complaint politely. Then ask 1 or 2 clear, polite clarifying questions in the citizen's language (English, Hindi, or Marathi) to find out:\n"
+                        f"1. Exact street, chowk, or nearby landmark in Ahilyanagar.\n"
+                        f"2. How long it has persisted and if there is any immediate hazard (accidents, health risk, etc.).\n"
+                        f"Keep it concise, friendly, and structured. Do not draft a petition letter yet."
+                    )
+                    resp = genai_client.models.generate_content(
+                        model=GEMINI_MODEL,
+                        contents=inquiry_prompt,
+                        config=types.GenerateContentConfig(temperature=0.3)
+                    )
+                    if resp and resp.text:
+                        clarifying_reply = resp.text
+                except Exception as e:
+                    logger.warning(f"Gemini inquiry turn failed: {e}. Using deterministic inquiry generator.")
+
+            if not clarifying_reply:
+                clarifying_reply = generate_clarifying_questions(user_message, category, dept_info["department_name"], detected_loc)
+
+            return {
+                "reply": clarifying_reply,
+                "agent_steps": [s.model_dump() for s in agent_steps],
+                "complaint_draft": None,
+                "submitted_complaint": None,
+                "duplicate_found": None,
+                "needs_confirmation": False,
+                "ready_for_submission": False,
+            }
+
+        # Step C: Turn 2 (Formulating the formal petition after clarification)
+        # If Gemini client is active, try Gemini Function Calling
         if genai_client:
             try:
                 gemini_result = self._run_gemini_agent(user_message, history, agent_steps, image_data, location_hint)
@@ -193,7 +408,7 @@ class CivicAgent:
                     summary="Switched to autonomous local civic agent pipeline for seamless execution."
                 ))
 
-        # Step C: Deterministic Autonomous Agent Pipeline (Always reliable, viva-safe!)
+        # Step D: Deterministic Autonomous Agent Pipeline (Always reliable, viva-safe!)
         return self._run_autonomous_pipeline(user_message, history, agent_steps, location_hint)
 
     def _run_gemini_agent(
@@ -248,13 +463,21 @@ class CivicAgent:
         dept_info = None
         priority_info = None
 
+        # Aggregate full user context across conversational turns
+        user_texts = [h.get("content", "") for h in history if h.get("role") in ["user", "human"]]
+        user_texts.append(user_message)
+        full_complaint_text = " ".join(user_texts).strip() or user_message
+
         if hasattr(response, "function_calls") and response.function_calls:
             for call in response.function_calls:
                 fn_name = call.name
                 fn_args = call.args or {}
                 
                 if fn_name == "classify_complaint_tool":
-                    res = tools.classify_complaint(fn_args.get("text", user_message))
+                    query_text = fn_args.get("text", "")
+                    if len(query_text.split()) < 4 or query_text == user_message:
+                        query_text = full_complaint_text
+                    res = tools.classify_complaint(query_text)
                     classified_category = res["category"]
                     sub_issue = res["sub_issue"]
                     agent_steps.append(AgentStep(
@@ -276,8 +499,11 @@ class CivicAgent:
                         summary=f"Matched to {res['department_name']} (SLA: {res['expected_resolution_days']} days)"
                     ))
                 elif fn_name == "score_priority_tool":
+                    query_text = fn_args.get("text", "")
+                    if len(query_text.split()) < 4 or query_text == user_message:
+                        query_text = full_complaint_text
                     cat = fn_args.get("category", classified_category or "Other")
-                    res = tools.score_priority(fn_args.get("text", user_message), cat)
+                    res = tools.score_priority(query_text, cat)
                     priority_info = res
                     agent_steps.append(AgentStep(
                         step_name="Priority & Risk Scoring",
@@ -288,10 +514,10 @@ class CivicAgent:
                     ))
 
         # Check if tools yielded a complaint structure
-        detected_loc = location_hint or extract_location(user_message, history)
+        detected_loc = location_hint or extract_location(full_complaint_text, history)
         if not classified_category:
             # Fallback classification if model gave pure text
-            cls = tools.classify_complaint(user_message)
+            cls = tools.classify_complaint(full_complaint_text)
             classified_category = cls["category"]
             sub_issue = cls["sub_issue"]
 
@@ -299,7 +525,7 @@ class CivicAgent:
             dept_info = tools.find_department(classified_category)
 
         if not priority_info:
-            priority_info = tools.score_priority(user_message, classified_category)
+            priority_info = tools.score_priority(full_complaint_text, classified_category)
 
         # Check for duplicates if location is known
         duplicate_match = None
@@ -345,7 +571,7 @@ class CivicAgent:
             "department": dept_info["department_name"],
             "authority_title": dept_info["authority_title"],
             "priority": priority_info["score"],
-            "description": user_message
+            "description": full_complaint_text
         })
         agent_steps.append(AgentStep(
             step_name="Drafting Formal Grievance",
@@ -397,15 +623,19 @@ class CivicAgent:
         Pure deterministic Agent Pipeline when external API is unreachable or for instant testing.
         Executes all tools deterministically, ensuring viva presentation is 100% stable.
         """
-        detected_loc = location_hint or extract_location(user_message, history)
+        # Aggregate full user context across conversational turns
+        user_texts = [h.get("content", "") for h in history if h.get("role") in ["user", "human"]]
+        user_texts.append(user_message)
+        full_complaint_text = " ".join(user_texts).strip() or user_message
+
+        detected_loc = location_hint or extract_location(full_complaint_text, history)
 
         # Check if user has answered a previous location question
         if not detected_loc and len(history) >= 2:
-            # Check last user message for location
             detected_loc = extract_location(user_message, [])
 
-        # 1. Classify
-        classification = tools.classify_complaint(user_message)
+        # 1. Classify using cumulative context
+        classification = tools.classify_complaint(full_complaint_text)
         category = classification["category"]
         sub_issue = classification["sub_issue"]
         agent_steps.append(AgentStep(
@@ -426,8 +656,8 @@ class CivicAgent:
             summary=f"Matched to {dept_info['department_name']} (SLA: {dept_info['expected_resolution_days']} days)"
         ))
 
-        # 3. Score Priority
-        priority_info = tools.score_priority(user_message, category)
+        # 3. Score Priority using cumulative details (duration, hazards, skids, etc.)
+        priority_info = tools.score_priority(full_complaint_text, category)
         agent_steps.append(AgentStep(
             step_name="Priority & Hazard Assessment",
             tool_name="score_priority",
@@ -495,7 +725,7 @@ class CivicAgent:
             "department": dept_info["department_name"],
             "authority_title": dept_info["authority_title"],
             "priority": priority_info["score"],
-            "description": user_message
+            "description": full_complaint_text
         })
         agent_steps.append(AgentStep(
             step_name="Formal Drafting",
@@ -519,10 +749,10 @@ class CivicAgent:
         )
 
         reply_msg = (
-            f"I've analyzed your grievance regarding **{category}** at **{final_loc}**.\n\n"
+            f"Thank you for providing the specific details. I've formulated your formal grievance regarding **{category}** at **{final_loc}**.\n\n"
             f"• **Department:** {dept_info['department_name']}\n"
             f"• **Target SLA:** {dept_info['expected_resolution_days']} working days\n"
-            f"• **Assessed Priority:** Level {priority_info['score']}/5\n\n"
+            f"• **Assessed Priority:** Level {priority_info['score']}/5 ({priority_info['reason']})\n\n"
         )
 
         if duplicate_match:
@@ -554,8 +784,9 @@ class CivicAgent:
         Calls submit_complaint and persists in DB.
         """
         # Reconstruct draft from previous bot context
-        full_text = " ".join([h.get("content", "") for h in history])
-        location = extract_location(full_text, []) or "Ahilyanagar"
+        user_texts = [h.get("content", "") for h in history if h.get("role") in ["user", "human"]]
+        full_text = " ".join(user_texts).strip() or " ".join([h.get("content", "") for h in history])
+        location = extract_location(full_text, history) or "Ahilyanagar"
         classification = tools.classify_complaint(full_text)
         dept_info = tools.find_department(classification["category"])
         priority_info = tools.score_priority(full_text, classification["category"])

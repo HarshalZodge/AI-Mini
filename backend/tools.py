@@ -99,6 +99,25 @@ AHILYANAGAR_NEIGHBORHOODS = {
     "station road": (19.0890, 74.7310),
     "dsp chowk": (19.1120, 74.7380),
     "gulshanabad": (19.0960, 74.7440),
+    # Marathi Devanagari spellings for local civic inquiries
+    "सावेडी": (19.1235, 74.7381),
+    "केडगाव": (19.0664, 74.7218),
+    "भिंगार": (19.0833, 74.7833),
+    "पाईपलाईन रोड": (19.1350, 74.7320),
+    "पाईपलाईन": (19.1350, 74.7320),
+    "तारकपूर": (19.1020, 74.7390),
+    "दिल्ली गेट": (19.0980, 74.7450),
+    "माळीवाडा": (19.0910, 74.7420),
+    "नागापूर": (19.1550, 74.7200),
+    "प्रेमदान चौक": (19.1270, 74.7340),
+    "प्रेमदान": (19.1270, 74.7340),
+    "प्रोफेसर चौक": (19.1180, 74.7360),
+    "मार्केट यार्ड": (19.0930, 74.7520),
+    "कोठला": (19.0850, 74.7350),
+    "बुरुडगाव": (19.0790, 74.7550),
+    "बोलहेगाव": (19.1410, 74.7450),
+    "कँप": (19.0880, 74.7700),
+    "स्टेशन रोड": (19.0890, 74.7310),
 }
 # Backward compatibility alias
 PUNE_NEIGHBORHOODS = AHILYANAGAR_NEIGHBORHOODS
@@ -137,36 +156,36 @@ def classify_complaint(text: str) -> Dict[str, str]:
     """
     t = text.lower()
 
-    if any(k in t for k in ["pothole", "road", "crater", "asphalt", "tar", "speed breaker", "footpath", "sidewalk", "divider"]):
-        sub = "Potholes & Damaged Road Surface" if "pothole" in t or "crater" in t else "Damaged Footpath / Road Infra"
+    if any(k in t for k in ["pothole", "road", "crater", "asphalt", "tar", "speed breaker", "footpath", "sidewalk", "divider", "खड्डा", "खड्डे", "रस्ता", "सडक", "डामर", "गड्डा", "पूल"]):
+        sub = "Potholes & Damaged Road Surface" if any(k in t for k in ["pothole", "crater", "खड्डा", "खड्डे", "गड्डा"]) else "Damaged Footpath / Road Infra"
         return {"category": "Roads & Potholes", "sub_issue": sub}
 
-    if any(k in t for k in ["water", "pipeline", "tap", "pressure", "drinking", "tanker", "contamination", "leakage", "pani", "paani"]):
-        sub = "No Water Supply" if ("no water" in t or "shut" in t or "pressure" in t) else "Pipeline Burst / Contaminated Water"
+    if any(k in t for k in ["water", "pipeline", "tap", "pressure", "drinking", "tanker", "contamination", "leakage", "pani", "paani", "पाणी", "नळ", "जल", "पाईप", "टाकी"]):
+        sub = "No Water Supply" if ("no water" in t or "shut" in t or "pressure" in t or "नाही" in t or "बंद" in t) else "Pipeline Burst / Contaminated Water"
         return {"category": "Water Supply", "sub_issue": sub}
 
-    if any(k in t for k in ["garbage", "trash", "waste", "dump", "bin", "kachra", "debris", "litter", "sweeping", "cleanliness"]):
-        sub = "Unattended Garbage Dump" if ("dump" in t or "pile" in t or "overflow" in t) else "Irregular Waste Collection"
+    if any(k in t for k in ["garbage", "trash", "waste", "dump", "bin", "kachra", "debris", "litter", "sweeping", "cleanliness", "कचरा", "घाण", "दुर्गंधी", "सफाई"]):
+        sub = "Unattended Garbage Dump" if ("dump" in t or "pile" in t or "overflow" in t or "साचला" in t) else "Irregular Waste Collection"
         return {"category": "Sanitation & Garbage", "sub_issue": sub}
 
-    if any(k in t for k in ["light", "streetlight", "lamp", "dark", "wire", "pole", "transformer", "electricity", "power cut", "current", "bijli"]):
-        sub = "Non-functional Streetlights" if "light" in t or "dark" in t else "Exposed Electrical Wire / Pole Damage"
+    if any(k in t for k in ["light", "streetlight", "lamp", "dark", "wire", "pole", "transformer", "electricity", "power cut", "current", "bijli", "लाईट", "दिवा", "विद्युत", "तारा", "खांब", "अंधार"]):
+        sub = "Non-functional Streetlights" if any(k in t for k in ["light", "dark", "दिवा", "अंधार", "बंद"]) else "Exposed Electrical Wire / Pole Damage"
         return {"category": "Electricity & Streetlights", "sub_issue": sub}
 
-    if any(k in t for k in ["drain", "drainage", "sewage", "gutter", "manhole", "overflowing", "stagnant water", "clogged"]):
-        sub = "Open / Hazardous Manhole" if "manhole" in t else "Overflowing Drainage & Gutter"
+    if any(k in t for k in ["drain", "drainage", "sewage", "gutter", "manhole", "overflowing", "stagnant water", "clogged", "गटार", "नाले", "ड्रेनेज", "मॅनहोल"]):
+        sub = "Open / Hazardous Manhole" if ("manhole" in t or "मॅनहोल" in t) else "Overflowing Drainage & Gutter"
         return {"category": "Drainage & Sewage", "sub_issue": sub}
 
-    if any(k in t for k in ["danger", "accident", "safety", "illegal parking", "stray dog", "dog bite", "harassment", "blind spot", "crime", "threat"]):
-        sub = "Immediate Public Hazard" if "hazard" in t or "accident" in t else "Public Safety & Animal Menace"
+    if any(k in t for k in ["danger", "accident", "safety", "illegal parking", "stray dog", "dog bite", "harassment", "blind spot", "crime", "threat", "अपघात", "धोका", "कुत्रे", "चोरी"]):
+        sub = "Immediate Public Hazard" if any(k in t for k in ["hazard", "accident", "अपघात", "धोका"]) else "Public Safety & Animal Menace"
         return {"category": "Public Safety", "sub_issue": sub}
 
-    if any(k in t for k in ["park", "garden", "tree", "branch", "playground", "bench", "fence", "grass"]):
-        sub = "Fallen Tree / Dangerous Branch" if "tree" in t or "branch" in t else "Poor Park Maintenance"
+    if any(k in t for k in ["park", "garden", "tree", "branch", "playground", "bench", "fence", "grass", "झाड", "बाग", "उद्यान"]):
+        sub = "Fallen Tree / Dangerous Branch" if ("tree" in t or "branch" in t or "झाड" in t) else "Poor Park Maintenance"
         return {"category": "Parks & Public Spaces", "sub_issue": sub}
 
-    if any(k in t for k in ["noise", "loudspeaker", "pollution", "smoke", "dust", "factory", "sound", "horn", "air quality"]):
-        sub = "Loudspeaker & Noise Violation" if "noise" in t or "loud" in t or "sound" in t else "Air & Dust Pollution"
+    if any(k in t for k in ["noise", "loudspeaker", "pollution", "smoke", "dust", "factory", "sound", "horn", "air quality", "आवाज", "प्रदूषण", "ध्वनी"]):
+        sub = "Loudspeaker & Noise Violation" if ("noise" in t or "loud" in t or "sound" in t or "आवाज" in t) else "Air & Dust Pollution"
         return {"category": "Noise & Pollution", "sub_issue": sub}
 
     return {"category": "Other", "sub_issue": "General Civic Concern"}
@@ -201,12 +220,15 @@ def score_priority(text: str, category: str) -> Dict[str, Any]:
     critical_triggers = [
         "open manhole", "live wire", "exposed wire", "electric shock",
         "hospital", "school", "children", "elderly", "deep crater",
-        "severe accident", "flooding", "collapsed", "fire hazard"
+        "severe accident", "accident", "skid", "slipped", "injury", "fall",
+        "flooding", "collapsed", "fire hazard",
+        "अपघात", "दुर्घटना", "जखमी", "घसरले"
     ]
     high_triggers = [
         "busy road", "main road", "highway", "drinking water contamination",
         "stinking", "maggots", "disease", "fever", "dengue", "overdue",
-        "days", "weeks", "months", "no water for", "traffic jam"
+        "days", "weeks", "months", "no water for", "traffic jam", "risk",
+        "धोका", "दुर्गंधी", "अंधार"
     ]
 
     is_critical = any(trig in t for trig in critical_triggers)
@@ -239,7 +261,7 @@ def check_duplicates(location: str, category: str, db: Session) -> List[Dict[str
     if not location or not category:
         return []
 
-    # Extract keywords from location (e.g. "Kothrud", "Baner", "Hinjawadi", "FC Road")
+    # Extract keywords from location (e.g. "Savedi", "Kedgaon", "Premdan Chowk", "Pipeline Road")
     loc_words = [w.strip().lower() for w in re.split(r'[, -/]', location) if len(w.strip()) > 3]
 
     active_complaints = db.query(Complaint).filter(
