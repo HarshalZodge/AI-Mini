@@ -13,9 +13,11 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
 import AgentStepsPanel from '../components/AgentStepsPanel';
 import ComplaintCard from '../components/ComplaintCard';
 import FormalLetterModal from '../components/FormalLetterModal';
+import LiveToolProgressPipeline from '../components/LiveToolProgressPipeline';
 import { sendChatMessage, analyzeImage, upvoteComplaint } from '../lib/api';
 
 const QUICK_PROMPTS = [
@@ -120,8 +122,15 @@ export default function LandingChatPage({ onNavigateTrack }) {
 
       setMessages(prev => [...prev, botMsg]);
 
-      // Save submitted complaints to local recent complaints
+      // Save submitted complaints to local recent complaints & celebrate with confetti
       if (res.submitted_complaint) {
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#5B5BD6', '#34A874', '#F2A33A', '#8383FF', '#10B981']
+        });
+
         try {
           const recents = JSON.parse(localStorage.getItem('civic_recent_complaints') || '[]');
           const updated = [res.submitted_complaint.tracking_id, ...recents.filter(x => x !== res.submitted_complaint.tracking_id)].slice(0, 5);
@@ -312,23 +321,11 @@ export default function LandingChatPage({ onNavigateTrack }) {
             ))}
           </AnimatePresence>
 
-          {/* Shimmer / Typing Indicator while AI executes tools */}
+          {/* Live Tool Calling Execution Pipeline */}
           {isLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-start space-y-2 max-w-[85%]"
-            >
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-[#FAFAF8] dark:bg-[#131316] border border-[#ECECE8] dark:border-[#27272A] text-xs text-[#6B7280] dark:text-[#9CA3AF]">
-                <div className="flex gap-1 items-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5B5BD6] animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5B5BD6] animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#5B5BD6] animate-bounce"></span>
-                </div>
-                <span className="ml-1.5 font-medium">Agent executing civic tools...</span>
-              </div>
-              <div className="w-64 h-8 rounded-xl animate-shimmer border border-[#ECECE8]/60 dark:border-[#27272A]/60"></div>
-            </motion.div>
+            <div className="flex flex-col items-start space-y-2 max-w-[85%] my-2">
+              <LiveToolProgressPipeline />
+            </div>
           )}
 
           <div ref={messagesEndRef} />

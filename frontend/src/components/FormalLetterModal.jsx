@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Copy, Check, Download, Printer, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function FormalLetterModal({ isOpen, onClose, letterText, title = "Formal Grievance Letter", trackingId }) {
   const [copied, setCopied] = useState(false);
@@ -57,9 +58,23 @@ export default function FormalLetterModal({ isOpen, onClose, letterText, title =
             <X className="w-4 h-4" />
           </button>
         </div>
-
         {/* Modal Body / Letter Content */}
-        <div className="p-6 overflow-y-auto flex-1 bg-[#FAFAF8] dark:bg-[#121214] printable-letter font-mono text-xs leading-relaxed whitespace-pre-wrap select-text text-[#1F2937] dark:text-[#E5E7EB] border-y border-[#ECECE8] dark:border-[#222226]">
+        <div className="relative p-6 overflow-y-auto flex-1 bg-[#FAFAF8] dark:bg-[#121214] printable-letter font-mono text-xs leading-relaxed whitespace-pre-wrap select-text text-[#1F2937] dark:text-[#E5E7EB] border-y border-[#ECECE8] dark:border-[#222226]">
+          {/* Animated Official Municipal Seal Stamp */}
+          <motion.div
+            initial={{ scale: 1.5, rotate: -25, opacity: 0 }}
+            animate={{ scale: 1, rotate: -10, opacity: 0.88 }}
+            transition={{ type: "spring", stiffness: 220, damping: 18, delay: 0.15 }}
+            className="absolute right-6 top-8 w-32 h-32 rounded-full border-4 border-dashed border-[#5B5BD6]/40 dark:border-[#8383FF]/40 pointer-events-none select-none flex flex-col items-center justify-center p-2 text-center text-[#5B5BD6] dark:text-[#8383FF]"
+          >
+            <div className="w-24 h-24 rounded-full border border-[#5B5BD6]/30 flex flex-col items-center justify-center p-1">
+              <span className="text-[7px] font-bold tracking-widest uppercase">STATUTORY PETITION</span>
+              <span className="text-[9px] font-extrabold uppercase tracking-tight my-0.5 text-[#E5484D]">PMC VERIFIED</span>
+              <span className="text-[7px] font-mono tracking-tighter">PUNE MUNICIPAL</span>
+              <span className="text-[6px] font-semibold tracking-wider text-[#34A874]">CITIZEN CHARTER</span>
+            </div>
+          </motion.div>
+
           {letterText}
         </div>
 

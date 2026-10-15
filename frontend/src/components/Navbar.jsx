@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   ArrowRightLeft
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Navbar({ 
   portal, 
@@ -34,16 +35,23 @@ export default function Navbar({
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-[#FAFAF8]/90 dark:bg-[#0F0F10]/90 border-b border-[#ECECE8] dark:border-[#27272A] transition-colors">
       <div className="max-w-[1100px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Logo Wordmark */}
+        {/* Logo Wordmark with Animated Icon */}
         <div 
           onClick={() => handlePortalSwitch('citizen')}
           className="flex items-center gap-2.5 cursor-pointer group shrink-0"
         >
-          <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-xs transition-transform group-hover:scale-105 ${
-            isManagement ? 'bg-[#18181B] dark:bg-[#27272A] border border-[#F2A33A]/40' : 'bg-[#5B5BD6]'
-          }`}>
+          <motion.div
+            key={portal}
+            initial={{ scale: 0.85, rotate: isManagement ? 15 : -15 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 380, damping: 22 }}
+            className={`w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-xs transition-transform group-hover:scale-105 ${
+              isManagement ? 'bg-[#18181B] dark:bg-[#27272A] border border-[#F2A33A]/40' : 'bg-[#5B5BD6]'
+            }`}
+          >
             {isManagement ? <Building2 className="w-4 h-4 text-[#F2A33A]" /> : <ShieldCheck className="w-4 h-4" />}
-          </div>
+          </motion.div>
+          
           <div className="flex flex-col">
             <div className="flex items-center">
               <span className="font-semibold text-base sm:text-lg tracking-tight text-[#111111] dark:text-[#F4F4F5]">
@@ -53,9 +61,14 @@ export default function Navbar({
                 isManagement ? 'bg-[#F2A33A]' : 'bg-[#5B5BD6]'
               }`} />
             </div>
-            <span className="text-[10px] -mt-1 font-medium text-[#6B7280] dark:text-[#9CA3AF]">
+            <motion.span 
+              key={portal}
+              initial={{ opacity: 0, y: -2 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-[10px] -mt-1 font-medium text-[#6B7280] dark:text-[#9CA3AF]"
+            >
               {isManagement ? 'PMC Management Suite' : 'Citizen Grievance Redressal'}
-            </span>
+            </motion.span>
           </div>
         </div>
 
@@ -66,38 +79,59 @@ export default function Navbar({
             <>
               <button
                 onClick={() => setActiveTab('report')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'report'
-                    ? 'bg-[#5B5BD6] text-white shadow-xs'
+                    ? 'text-white'
                     : 'text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111] dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                <MessageSquarePlus className="w-3.5 h-3.5" />
-                <span>Report</span>
+                {activeTab === 'report' && (
+                  <motion.div
+                    layoutId="active-pill"
+                    className="absolute inset-0 rounded-lg bg-[#5B5BD6] shadow-xs"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <MessageSquarePlus className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Report</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('track')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'track'
-                    ? 'bg-[#5B5BD6] text-white shadow-xs'
+                    ? 'text-white'
                     : 'text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111] dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                <Activity className="w-3.5 h-3.5" />
-                <span>Track</span>
+                {activeTab === 'track' && (
+                  <motion.div
+                    layoutId="active-pill"
+                    className="absolute inset-0 rounded-lg bg-[#5B5BD6] shadow-xs"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <Activity className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Track</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('community')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'community'
-                    ? 'bg-[#5B5BD6] text-white shadow-xs'
+                    ? 'text-white'
                     : 'text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111] dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                <Users className="w-3.5 h-3.5" />
-                <span>Pulse</span>
+                {activeTab === 'community' && (
+                  <motion.div
+                    layoutId="active-pill"
+                    className="absolute inset-0 rounded-lg bg-[#5B5BD6] shadow-xs"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <Users className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Pulse</span>
               </button>
             </>
           ) : (
@@ -105,26 +139,40 @@ export default function Navbar({
             <>
               <button
                 onClick={() => setActiveTab('mgmt_command')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'mgmt_command'
-                    ? 'bg-[#18181B] text-white dark:bg-[#27272A] shadow-xs border border-[#F2A33A]/50'
+                    ? 'text-white'
                     : 'text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111] dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                <AlertTriangle className="w-3.5 h-3.5 text-[#F2A33A]" />
-                <span>SLA Radar & Dispatch</span>
+                {activeTab === 'mgmt_command' && (
+                  <motion.div
+                    layoutId="active-mgmt-pill"
+                    className="absolute inset-0 rounded-lg bg-[#18181B] dark:bg-[#27272A] border border-[#F2A33A]/50 shadow-xs"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <AlertTriangle className="w-3.5 h-3.5 text-[#F2A33A] relative z-10" />
+                <span className="relative z-10">SLA Radar & Dispatch</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('admin')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   activeTab === 'admin'
-                    ? 'bg-[#18181B] text-white dark:bg-[#27272A] shadow-xs'
+                    ? 'text-white'
                     : 'text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111] dark:hover:text-[#F4F4F5]'
                 }`}
               >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>Registry & Heatmap</span>
+                {activeTab === 'admin' && (
+                  <motion.div
+                    layoutId="active-mgmt-pill"
+                    className="absolute inset-0 rounded-lg bg-[#18181B] dark:bg-[#27272A] shadow-xs"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <LayoutDashboard className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Registry & Heatmap</span>
               </button>
             </>
           )}
@@ -132,8 +180,10 @@ export default function Navbar({
 
         {/* Right side Portal Switcher & Theme */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Distinct Portal Switcher Button */}
-          <button
+          {/* Animated Morphing Portal Switcher Button */}
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => handlePortalSwitch(isManagement ? 'citizen' : 'management')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               isManagement
@@ -148,16 +198,18 @@ export default function Navbar({
             <span className="sm:hidden">
               {isManagement ? 'Citizen' : 'Officer'}
             </span>
-          </button>
+          </motion.button>
 
           {/* Theme Toggle */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.94 }}
             onClick={() => setDarkMode(!darkMode)}
             aria-label="Toggle theme"
             className="p-2 rounded-xl text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111] dark:hover:text-[#F4F4F5] hover:bg-[#F4F4F2] dark:hover:bg-[#1E1E22] border border-[#ECECE8] dark:border-[#27272A] transition-all"
           >
             {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+          </motion.button>
         </div>
       </div>
     </header>
