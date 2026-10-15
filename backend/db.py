@@ -4,7 +4,21 @@ from datetime import datetime, timezone
 from sqlalchemy import create_engine, Column, Integer, String, Text, Float, Boolean, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./civic_resolve.db")
+import shutil
+
+# Use /tmp directory on Vercel serverless environment (writable memory disk)
+if os.getenv("VERCEL"):
+    DATABASE_PATH = "/tmp/civic_resolve.db"
+    # Copy pre-seeded database if available in repo
+    local_db = os.path.join(os.path.dirname(os.path.abspath(__file__)), "civic_resolve.db")
+    if os.path.exists(local_db) and not os.path.exists(DATABASE_PATH):
+        try:
+            shutil.copy2(local_db, DATABASE_PATH)
+        except Exception:
+            pass
+    DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DATABASE_PATH}")
+else:
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./civic_resolve.db")
 
 engine = create_engine(
     DATABASE_URL,
