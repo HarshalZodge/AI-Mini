@@ -21,7 +21,7 @@ graph TD
     subgraph "AI Agent & Function Calling"
         D <-->|Multi-turn Dialogue + Tool Specs| E[Google Gemini Flash]
         D -->|Tool 1: classify_complaint| F1[Categorization Engine]
-        D -->|Tool 2: find_department| F2[Local PMC Lookup Table]
+        D -->|Tool 2: find_department| F2[Local AMC Lookup Table]
         D -->|Tool 3: score_priority| F3[Hazard & Proximity Scorer]
         D -->|Tool 4: check_duplicates| F4[SQLite Duplicate Audit]
         D -->|Tool 5: generate_formal_letter| F5[Statutory Letter Generator]
@@ -47,12 +47,12 @@ CivicResolve separates public citizen participation from municipal administrativ
 ### 👤 1. Citizen Grievance Portal (For the People)
 - **Report an Issue (`/`)**: Natural conversational interface in **English, Hindi, or Marathi**. Autonomous tool calling, photo attachment with Gemini Vision inspection, and formal petition generation.
 - **Track Status (`/track`)**: Animated vertical stepper (`Submitted` $\rightarrow$ `Assigned` $\rightarrow$ `In Progress` $\rightarrow$ `Resolved`), plain-language updates, statutory escalation for overdue tickets, and a live demo mode for viva presentations.
-- **Neighborhood Pulse (`community`)**: A live community wall showing issues reported across Pune localities (Kothrud, Baner, Hinjawadi, Viman Nagar, etc.) with 1-click **"I Face This Too"** upvoting to raise priority.
+- **Neighborhood Pulse (`community`)**: A live community wall showing issues reported across Ahilyanagar localities (Savedi, Kedgaon, Bhingar, Tarakpur, Delhi Gate, etc.) with 1-click **"I Face This Too"** upvoting to raise priority.
 
-### 🏛️ 2. PMC Municipal Management Suite (For Ward Officers & Engineers)
+### 🏛️ 2. AMC Municipal Management Suite (For Ward Officers & Engineers)
 - **SLA Breach Risk Radar (`mgmt_command`)**: Real-time radar identifying tickets that have exceeded or are within 24 hours of breaching the Citizen Charter SLA window.
-- **Official Contractor Work Order Generator**: Generates formal municipal dispatch dockets (`WO-PMC-2026-XXXX`) with assigned Junior Field Engineers, contractor agencies, and required equipment. Automatically advances ticket status to *In Progress*.
-- **Department SLA Compliance Leaderboards**: Ranks PMC departments (Roads, Water, Sanitation, Electrical, Drainage, etc.) by on-time resolution rate and case backlog.
+- **Official Contractor Work Order Generator**: Generates formal municipal dispatch dockets (`WO-AMC-2026-XXXX`) with assigned Junior Field Engineers, contractor agencies, and required equipment. Automatically advances ticket status to *In Progress*.
+- **Department SLA Compliance Leaderboards**: Ranks AMC departments (Roads, Water, Sanitation, Electrical, Drainage, etc.) by on-time resolution rate and case backlog.
 - **Municipal Command Dashboard (`admin`)**: OpenStreetMap spatial view, telemetry cards, Gemini AI weekly intelligence summary, and filterable complaint registry with live status dropdowns.
 - **Gemini AI Weekly Insight**: AI-generated municipal brief summarizing problem corridors and providing 3 actionable governance recommendations.
 - **Recharts Visualizations**: Interactive Category Donut breakdown and 1–5 Priority Severity spectrum.
@@ -75,7 +75,7 @@ CivicAI-mini/
 │   ├── tools.py           # Civic tools (classification, routing, priority, duplicates)
 │   ├── db.py              # SQLite database configuration & SQLAlchemy models
 │   ├── schemas.py         # Pydantic request & response validation schemas
-│   ├── seed.py            # Pre-seeded sample complaints across Pune
+│   ├── seed.py            # Pre-seeded sample complaints across Ahilyanagar
 │   ├── requirements.txt   # Python dependencies
 │   ├── .env.example       # Example environment variables
 │   └── .env               # Active configuration (GEMINI_API_KEY, GEMINI_MODEL)
@@ -124,7 +124,7 @@ pip install -r requirements.txt
 # GEMINI_API_KEY=your_gemini_api_key_here
 # GEMINI_MODEL=gemini-2.5-flash
 
-# 3. Seed database with ~15 Pune civic complaints
+# 3. Seed database with ~15 Ahilyanagar civic complaints
 python seed.py
 
 # 4. Start the FastAPI server
@@ -154,13 +154,13 @@ npm run dev
 When explaining this project in an examination or viva:
 
 1. **System Prompt & Role Grounding (`agent.py`)**:
-   - Grounds Gemini as an empathetic, civic assistant for Pune Municipal Corporation.
+   - Grounds Gemini as an empathetic, civic assistant for Ahilyanagar Municipal Corporation.
    - Constrains authority names to the verified local lookup table (`DEPARTMENT_LOOKUP`).
    - Limits conversational follow-up questions to at most 2.
 
 2. **Function Calling Tool Declarations**:
    - `classify_complaint(text)`: Extracts standardized category and sub-issue.
-   - `find_department(category)`: Identifies the responsible PMC executive division and Citizen Charter SLA turnaround days.
+   - `find_department(category)`: Identifies the responsible AMC executive division and Citizen Charter SLA turnaround days.
    - `score_priority(text, category)`: Calculates a 1–5 hazard score based on risk triggers (open manholes, live wires, hospitals, schools).
    - `check_duplicates(location, category)`: Queries SQLite for active grievances in the same vicinity.
    - `generate_formal_letter(details)`: Creates a formal petition citing the Citizen's Charter and demanding time-bound rectification.

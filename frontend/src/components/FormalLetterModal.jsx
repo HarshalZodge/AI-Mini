@@ -69,8 +69,8 @@ export default function FormalLetterModal({ isOpen, onClose, letterText, title =
           >
             <div className="w-24 h-24 rounded-full border border-[#5B5BD6]/30 flex flex-col items-center justify-center p-1">
               <span className="text-[7px] font-bold tracking-widest uppercase">STATUTORY PETITION</span>
-              <span className="text-[9px] font-extrabold uppercase tracking-tight my-0.5 text-[#E5484D]">PMC VERIFIED</span>
-              <span className="text-[7px] font-mono tracking-tighter">PUNE MUNICIPAL</span>
+              <span className="text-[9px] font-extrabold uppercase tracking-tight my-0.5 text-[#E5484D]">AMC VERIFIED</span>
+              <span className="text-[7px] font-mono tracking-tighter">AHILYANAGAR MUNICIPAL</span>
               <span className="text-[6px] font-semibold tracking-wider text-[#34A874]">CITIZEN CHARTER</span>
             </div>
           </motion.div>

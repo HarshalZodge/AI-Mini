@@ -18,109 +18,105 @@ CATEGORIES = [
     "Other",
 ]
 
-# Local lookup table for Pune civic authorities
+# Local lookup table for Ahilyanagar civic authorities
 DEPARTMENT_LOOKUP = {
     "Roads & Potholes": {
-        "department_name": "PMC Road & Infrastructure Department",
-        "authority_title": "Executive Engineer (Road Infrastructure), Pune Municipal Corporation",
+        "department_name": "AMC Road & Infrastructure Department",
+        "authority_title": "Executive Engineer (PWD & Roads), Ahilyanagar Municipal Corporation",
         "expected_resolution_days": 4,
-        "escalation_authority": "Chief Engineer (Projects & Infrastructure), PMC"
+        "escalation_authority": "Chief Engineer (Infrastructure), Ahilyanagar Municipal Corporation"
     },
     "Water Supply": {
-        "department_name": "PMC Water Supply & Pumping Department",
-        "authority_title": "Superintending Engineer (Water Works), Pune Municipal Corporation",
+        "department_name": "AMC Water Supply & Filtration Department",
+        "authority_title": "Superintending Engineer (Water Supply & Mula Dam Distribution), AMC",
         "expected_resolution_days": 3,
-        "escalation_authority": "Additional Municipal Commissioner (City Water Wing), PMC"
+        "escalation_authority": "Additional Municipal Commissioner (Water Works), Ahilyanagar"
     },
     "Sanitation & Garbage": {
-        "department_name": "PMC Solid Waste Management Department",
-        "authority_title": "Deputy Municipal Commissioner (Solid Waste Management), Pune Municipal Corporation",
+        "department_name": "AMC Solid Waste Management & Health Department",
+        "authority_title": "Chief Health Officer & Deputy Commissioner (Sanitation), AMC",
         "expected_resolution_days": 2,
-        "escalation_authority": "Additional Municipal Commissioner (General Administration), PMC"
+        "escalation_authority": "Deputy Municipal Commissioner (General Administration), AMC"
     },
     "Electricity & Streetlights": {
-        "department_name": "MSEDCL & PMC Electrical Department",
-        "authority_title": "Junior Engineer (Public Street Lighting & Power Distribution), Pune",
+        "department_name": "MSEDCL Ahilyanagar Circle & AMC Electrical Department",
+        "authority_title": "Junior Engineer (Public Street Lighting & Power Distribution), Ahilyanagar",
         "expected_resolution_days": 2,
-        "escalation_authority": "Superintending Engineer, Maharashtra State Electricity Distribution Co. Ltd. (MSEDCL)"
+        "escalation_authority": "Superintending Engineer, MSEDCL Ahilyanagar Circle"
     },
     "Drainage & Sewage": {
-        "department_name": "PMC Drainage & Sewerage Department",
-        "authority_title": "Executive Engineer (Drainage Maintenance), Pune Municipal Corporation",
+        "department_name": "AMC Drainage & Underground Sewerage Department",
+        "authority_title": "Executive Engineer (Drainage Maintenance), Ahilyanagar Municipal Corporation",
         "expected_resolution_days": 3,
-        "escalation_authority": "Chief Engineer (Sewerage & Environmental Sanitation), PMC"
+        "escalation_authority": "Chief Engineer (Environmental Sanitation), AMC"
     },
     "Public Safety": {
-        "department_name": "Pune City Police & PMC Disaster Management Cell",
-        "authority_title": "Assistant Commissioner of Police / Ward Disaster Officer, Pune",
+        "department_name": "Ahilyanagar City Police & AMC Disaster Management Cell",
+        "authority_title": "Assistant Commissioner of Police / City Ward Officer, Ahilyanagar",
         "expected_resolution_days": 1,
-        "escalation_authority": "Deputy Commissioner of Police (Traffic & Safety) / Municipal Commissioner"
+        "escalation_authority": "Deputy Commissioner of Police / Municipal Commissioner, AMC"
     },
     "Parks & Public Spaces": {
-        "department_name": "PMC Garden & Tree Authority Department",
-        "authority_title": "Superintendent of Parks & Gardens, Pune Municipal Corporation",
+        "department_name": "AMC Garden & Tree Authority Department",
+        "authority_title": "Superintendent of Parks & Gardens, Ahilyanagar Municipal Corporation",
         "expected_resolution_days": 7,
-        "escalation_authority": "Deputy Municipal Commissioner (Environment & Gardens), PMC"
+        "escalation_authority": "Deputy Municipal Commissioner (Environment), AMC"
     },
     "Noise & Pollution": {
-        "department_name": "Maharashtra Pollution Control Board (MPCB) & PMC Environment Cell",
-        "authority_title": "Regional Officer, MPCB & Environment Officer, PMC",
+        "department_name": "Maharashtra Pollution Control Board (MPCB) Sub-Regional Office, Ahilyanagar",
+        "authority_title": "Regional Officer, MPCB & Environment Cell Officer, AMC",
         "expected_resolution_days": 3,
-        "escalation_authority": "Member Secretary, Maharashtra Pollution Control Board, Mumbai/Pune"
+        "escalation_authority": "Regional Officer, MPCB Nashik/Ahilyanagar Division"
     },
     "Other": {
-        "department_name": "PMC Citizen Facilitation Center (CFC)",
-        "authority_title": "Ward Grievance Redressal Officer, Pune Municipal Corporation",
+        "department_name": "AMC Citizen Facilitation Center (CFC)",
+        "authority_title": "Ward Grievance Redressal Officer, Ahilyanagar Municipal Corporation",
         "expected_resolution_days": 5,
-        "escalation_authority": "Municipal Commissioner, Pune Municipal Corporation"
+        "escalation_authority": "Municipal Commissioner, Ahilyanagar Municipal Corporation"
     }
 }
 
-# Pune area approximate coordinates for realistic mapping
-PUNE_NEIGHBORHOODS = {
-    "kothrud": (18.5074, 73.8077),
-    "hinjawadi": (18.5913, 73.7389),
-    "hinjewadi": (18.5913, 73.7389),
-    "baner": (18.5590, 73.7868),
-    "shivajinagar": (18.5308, 73.8475),
-    "viman nagar": (18.5679, 73.9143),
-    "hadapsar": (18.5089, 73.9259),
-    "swargate": (18.5018, 73.8636),
-    "camp": (18.5158, 73.8797),
-    "mg road": (18.5165, 73.8780),
-    "wakad": (18.5987, 73.7667),
-    "aundh": (18.5580, 73.8073),
-    "kalyani nagar": (18.5484, 73.9030),
-    "katraj": (18.4575, 73.8677),
-    "deccan": (18.5167, 73.8417),
-    "deccan gymkhana": (18.5167, 73.8417),
-    "pashan": (18.5414, 73.7925),
-    "bavdhan": (18.5140, 73.7709),
-    "magarpatta": (18.5158, 73.9272),
-    "kondhwa": (18.4739, 73.8938),
-    "pimpri": (18.6279, 73.8009),
-    "chinchwad": (18.6298, 73.7997),
-    "karve nagar": (18.4912, 73.8188),
-    "warje": (18.4831, 73.7942),
-    "fc road": (18.5262, 73.8427),
-    "jm road": (18.5280, 73.8480),
+# Ahilyanagar, Maharashtra area approximate coordinates for mapping
+AHILYANAGAR_NEIGHBORHOODS = {
+    "savedi": (19.1235, 74.7381),
+    "kedgaon": (19.0664, 74.7218),
+    "bhingar": (19.0833, 74.7833),
+    "pipeline road": (19.1350, 74.7320),
+    "tarakpur": (19.1020, 74.7390),
+    "delhi gate": (19.0980, 74.7450),
+    "maliwada": (19.0910, 74.7420),
+    "nagapur": (19.1550, 74.7200),
+    "nagapur midc": (19.1550, 74.7200),
+    "kotla": (19.0850, 74.7350),
+    "burudgaon": (19.0790, 74.7550),
+    "burudgaon road": (19.0790, 74.7550),
+    "bolhegaon": (19.1410, 74.7450),
+    "market yard": (19.0930, 74.7520),
+    "professor chowk": (19.1180, 74.7360),
+    "premdan chowk": (19.1270, 74.7340),
+    "camp": (19.0880, 74.7700),
+    "cantonment": (19.0880, 74.7700),
+    "station road": (19.0890, 74.7310),
+    "dsp chowk": (19.1120, 74.7380),
+    "gulshanabad": (19.0960, 74.7440),
 }
+# Backward compatibility alias
+PUNE_NEIGHBORHOODS = AHILYANAGAR_NEIGHBORHOODS
 
 
 def geocode_location(location_str: str) -> tuple[float, float]:
-    """Finds lat/lng coordinates for location string within Pune, with subtle jitter if multiple."""
+    """Finds lat/lng coordinates for location string within Ahilyanagar, with subtle jitter if multiple."""
     loc_lower = (location_str or "").lower()
-    for name, coords in PUNE_NEIGHBORHOODS.items():
+    for name, coords in AHILYANAGAR_NEIGHBORHOODS.items():
         if name in loc_lower:
-            # Slight random offset (~50-100m) so multiple pins don't overlap completely
-            jitter_lat = (random.random() - 0.5) * 0.004
-            jitter_lng = (random.random() - 0.5) * 0.004
+            jitter_lat = (random.random() - 0.5) * 0.003
+            jitter_lng = (random.random() - 0.5) * 0.003
             return round(coords[0] + jitter_lat, 5), round(coords[1] + jitter_lng, 5)
 
-    # Default to Central Pune with random offset around PMC headquarters
-    base_lat, base_lng = 18.5204, 73.8567
-    jitter_lat = (random.random() - 0.5) * 0.04
-    jitter_lng = (random.random() - 0.5) * 0.04
+    # Default to Central Ahilyanagar around Municipal Corporation HQ
+    base_lat, base_lng = 19.0952, 74.7496
+    jitter_lat = (random.random() - 0.5) * 0.03
+    jitter_lng = (random.random() - 0.5) * 0.03
     return round(base_lat + jitter_lat, 5), round(base_lng + jitter_lng, 5)
 
 
@@ -176,7 +172,7 @@ def classify_complaint(text: str) -> Dict[str, str]:
     return {"category": "Other", "sub_issue": "General Civic Concern"}
 
 
-def find_department(category: str, city: str = "Pune") -> Dict[str, Any]:
+def find_department(category: str, city: str = "Ahilyanagar") -> Dict[str, Any]:
     """
     Finds the designated municipal department, executive authority title,
     and official citizen-charter SLA resolution days based on the category.
@@ -187,7 +183,7 @@ def find_department(category: str, city: str = "Pune") -> Dict[str, Any]:
         "authority_title": dept_info["authority_title"],
         "expected_resolution_days": dept_info["expected_resolution_days"],
         "city": city,
-        "escalation_authority": dept_info.get("escalation_authority", "Municipal Commissioner, PMC")
+        "escalation_authority": dept_info.get("escalation_authority", "Municipal Commissioner, Ahilyanagar Municipal Corporation")
     }
 
 
@@ -277,10 +273,10 @@ def generate_formal_letter(details: Dict[str, Any]) -> str:
     """
     category = details.get("category", "Civic Grievance")
     sub_issue = details.get("sub_issue", "Civic Infrastructure Issue")
-    location = details.get("location", "Pune City")
+    location = details.get("location", "Ahilyanagar City")
     landmark = details.get("landmark", "")
     full_loc = f"{location} (Near: {landmark})" if landmark else location
-    department = details.get("department", "Pune Municipal Corporation")
+    department = details.get("department", "Ahilyanagar Municipal Corporation")
     authority_title = details.get("authority_title", "Concerned Civic Authority")
     priority = details.get("priority", 3)
     urgency_tag = "URGENT / CRITICAL" if priority >= 4 else "REGULAR"
@@ -290,7 +286,7 @@ def generate_formal_letter(details: Dict[str, Any]) -> str:
     letter = f"""To,
 The {authority_title},
 {department},
-Pune Municipal Corporation (PMC), Pune, Maharashtra.
+Ahilyanagar Municipal Corporation (AMC), Ahilyanagar, Maharashtra.
 
 Date: {today_str}
 Priority Classification: Level {priority}/5 [{urgency_tag}]
@@ -327,7 +323,7 @@ def draft_escalation(complaint: Complaint, reason: Optional[str] = None) -> Dict
     Generates an escalation notice to a higher municipal authority for an overdue or stalled grievance.
     """
     dept_info = DEPARTMENT_LOOKUP.get(complaint.category, DEPARTMENT_LOOKUP["Other"])
-    higher_auth = dept_info.get("escalation_authority", "The Municipal Commissioner, Pune Municipal Corporation")
+    higher_auth = dept_info.get("escalation_authority", "The Municipal Commissioner, Ahilyanagar Municipal Corporation")
     today_str = datetime.now().strftime("%B %d, %Y")
     days_open = 0
     if complaint.created_at:
@@ -337,7 +333,7 @@ def draft_escalation(complaint: Complaint, reason: Optional[str] = None) -> Dict
 
 To,
 {higher_auth},
-Pune Municipal Corporation / Government of Maharashtra.
+Ahilyanagar Municipal Corporation / Government of Maharashtra.
 
 Date: {today_str}
 Escalation Reference: ESC-{complaint.tracking_id}
@@ -392,10 +388,10 @@ def submit_complaint(data: Dict[str, Any], db: Session) -> Dict[str, Any]:
     Saves a verified, structured complaint into SQLite and initializes timeline.
     """
     tracking_id = generate_tracking_id(db)
-    coords = geocode_location(data.get("location", "Pune"))
+    coords = geocode_location(data.get("location", "Ahilyanagar"))
     
     category = data.get("category", "Other")
-    dept_info = find_department(category, data.get("city", "Pune"))
+    dept_info = find_department(category, data.get("city", "Ahilyanagar"))
     
     priority = int(data.get("priority", 3))
     priority_reason = data.get("priority_reason") or f"Assessed at level {priority}/5 for civic safety and public convenience."
@@ -444,7 +440,7 @@ def submit_complaint(data: Dict[str, Any], db: Session) -> Dict[str, Any]:
         formal_letter = generate_formal_letter({
             "category": category,
             "sub_issue": data.get("sub_issue", category),
-            "location": data.get("location", "Pune"),
+            "location": data.get("location", "Ahilyanagar"),
             "landmark": data.get("landmark"),
             "department": dept_info["department_name"],
             "authority_title": dept_info["authority_title"],
@@ -454,13 +450,13 @@ def submit_complaint(data: Dict[str, Any], db: Session) -> Dict[str, Any]:
 
     complaint = Complaint(
         tracking_id=tracking_id,
-        title=data.get("title") or f"{category} at {data.get('location', 'Pune')}",
+        title=data.get("title") or f"{category} at {data.get('location', 'Ahilyanagar')}",
         description=data.get("description") or data.get("title") or "Civic grievance filed via CivicResolve.",
         category=category,
         sub_issue=data.get("sub_issue", category),
-        location=data.get("location", "Pune"),
+        location=data.get("location", "Ahilyanagar"),
         landmark=data.get("landmark"),
-        city=data.get("city", "Pune"),
+        city=data.get("city", "Ahilyanagar"),
         latitude=data.get("latitude") or coords[0],
         longitude=data.get("longitude") or coords[1],
         priority=priority,

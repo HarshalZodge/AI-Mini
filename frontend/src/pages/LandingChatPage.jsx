@@ -21,10 +21,10 @@ import LiveToolProgressPipeline from '../components/LiveToolProgressPipeline';
 import { sendChatMessage, analyzeImage, upvoteComplaint } from '../lib/api';
 
 const QUICK_PROMPTS = [
-  "Pothole near Paud Road, Kothrud",
-  "No drinking water since morning in Baner",
-  "Garbage overflowing opposite IT Park Hinjawadi",
-  "Streetlights dark on JM Road Shivajinagar"
+  "Pothole near Pipeline Road, Savedi",
+  "No drinking water since morning in Professor Chowk",
+  "Garbage overflowing near Kedgaon Bypass Road",
+  "Streetlights dark on Tarakpur Bus Stand road"
 ];
 
 export default function LandingChatPage({ onNavigateTrack }) {
@@ -32,7 +32,7 @@ export default function LandingChatPage({ onNavigateTrack }) {
     {
       id: 'welcome',
       role: 'assistant',
-      content: "Namaste! I am **CivicResolve**, your AI civic redressal agent for Pune Municipal Corporation.\n\nDescribe any issue in **English, Hindi, or Marathi** (e.g., potholes, garbage, water supply, broken streetlights). I'll autonomously classify it, match the right department, evaluate safety priority, and draft your formal grievance letter.",
+      content: "Namaste! I am **CivicResolve**, your AI civic redressal agent for Ahilyanagar Municipal Corporation (AMC).\n\nDescribe any issue in **English, Hindi, or Marathi** (e.g., potholes, garbage, water supply, broken streetlights). I'll autonomously classify it, match the right department, evaluate safety priority, and draft your formal grievance letter.",
       steps: [],
     }
   ]);
@@ -192,7 +192,7 @@ export default function LandingChatPage({ onNavigateTrack }) {
           </h1>
 
           <p className="mt-2.5 max-w-xl mx-auto text-sm sm:text-base text-[#6B7280] dark:text-[#9CA3AF] leading-relaxed">
-            Report civic grievances naturally. Our AI agent classifies the issue, calculates safety priority, prevents duplicates, and routes formal petitions to Pune Municipal Corporation.
+            Report civic grievances naturally. Our AI agent classifies the issue, calculates safety priority, prevents duplicates, and routes formal petitions to Ahilyanagar Municipal Corporation.
           </p>
         </motion.div>
       </section>
@@ -294,7 +294,7 @@ export default function LandingChatPage({ onNavigateTrack }) {
                         className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-[#5B5BD6] hover:bg-[#4848BD] text-white font-medium text-xs shadow-xs transition-transform active:scale-98"
                       >
                         <Check className="w-3.5 h-3.5" />
-                        <span>Confirm & Submit to PMC</span>
+                        <span>Confirm & Submit to AMC</span>
                       </button>
 
                       <button
@@ -407,7 +407,7 @@ export default function LandingChatPage({ onNavigateTrack }) {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Describe your issue or enter location in Pune..."
+              placeholder="Describe your issue or enter location in Ahilyanagar..."
               className="flex-1 py-2.5 px-4 rounded-xl border border-[#ECECE8] dark:border-[#27272A] bg-[#FAFAF8] dark:bg-[#131316] text-sm text-[#111111] dark:text-[#F4F4F5] placeholder-[#9CA3AF] focus:outline-hidden focus:ring-1 focus:ring-[#5B5BD6] dark:focus:ring-[#6E6EF7] transition-all"
             />
 

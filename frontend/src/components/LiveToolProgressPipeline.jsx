@@ -13,9 +13,9 @@ import { motion } from 'framer-motion';
 
 const TOOL_STEPS = [
   { id: 1, label: "Classifying grievance category & issue", tool: "classify_complaint()", icon: Tag },
-  { id: 2, label: "Routing to official PMC Ward Department", tool: "find_department()", icon: Building2 },
+  { id: 2, label: "Routing to official AMC Ward Department", tool: "find_department()", icon: Building2 },
   { id: 3, label: "Scoring life-safety hazard & priority", tool: "score_priority()", icon: ShieldAlert },
-  { id: 4, label: "Auditing active duplicates in Pune", tool: "check_duplicates()", icon: CopyCheck },
+  { id: 4, label: "Auditing active duplicates in Ahilyanagar", tool: "check_duplicates()", icon: CopyCheck },
   { id: 5, label: "Generating formal Citizen Charter petition", tool: "generate_formal_letter()", icon: FileText },
 ];
 

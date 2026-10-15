@@ -117,12 +117,12 @@ export default function App() {
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#111111] dark:text-[#F4F4F5]">CivicResolve</span>
             <span>—</span>
-            <span>{portal === 'management' ? 'Pune Municipal Corporation Administration Suite' : 'Citizen Grievance Redressal Agent'}</span>
+            <span>{portal === 'management' ? 'Ahilyanagar Municipal Corporation Administration Suite' : 'Citizen Grievance Redressal Agent'}</span>
           </div>
           <div className="flex items-center gap-3 text-[11px]">
             <span>{portal === 'management' ? 'Official Command Center' : 'Public Grievance Portal'}</span>
             <span>•</span>
-            <span>PMC Ward Routing</span>
+            <span>AMC Ward Routing</span>
             <span>•</span>
             <span>College AI Mini Project</span>
           </div>

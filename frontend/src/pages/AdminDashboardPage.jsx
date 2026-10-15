@@ -363,13 +363,13 @@ export default function AdminDashboardPage({ onNavigateTrack }) {
         </div>
       </div>
 
-      {/* Spatial Map of Pune Grievances */}
+      {/* Spatial Map of Ahilyanagar Grievances */}
       <div className="p-5 rounded-2xl bg-[#FFFFFF] dark:bg-[#17171A] border border-[#ECECE8] dark:border-[#27272A] shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h3 className="font-semibold text-sm text-[#111111] dark:text-[#F4F4F5] flex items-center gap-2">
               <MapPin className="w-4 h-4 text-[#5B5BD6]" />
-              Pune City Civic Heatmap & Geo-Pins
+              Ahilyanagar City Civic Heatmap & Geo-Pins
             </h3>
             <p className="text-xs text-[#6B7280] dark:text-[#9CA3AF] mt-0.5">
               Interactive OpenStreetMap markers colored by priority level. Click any pin to inspect and endorse.
@@ -395,8 +395,8 @@ export default function AdminDashboardPage({ onNavigateTrack }) {
         {/* Map Container */}
         <div className="h-[360px] w-full rounded-xl overflow-hidden border border-[#ECECE8] dark:border-[#27272A]">
           <MapContainer
-            center={[18.5204, 73.8567]}
-            zoom={12}
+            center={[19.0952, 74.7496]}
+            zoom={13}
             scrollWheelZoom={false}
             style={{ height: '100%', width: '100%' }}
           >

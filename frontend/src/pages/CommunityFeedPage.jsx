@@ -16,26 +16,27 @@ import { motion } from 'framer-motion';
 import { fetchComplaints, upvoteComplaint } from '../lib/api';
 import FormalLetterModal from '../components/FormalLetterModal';
 
-const PUNE_AREAS = [
-  "All Pune",
-  "Kothrud",
-  "Baner",
-  "Hinjawadi",
-  "Shivajinagar",
-  "Viman Nagar",
-  "Hadapsar",
-  "Swargate",
-  "Camp",
-  "Wakad",
-  "Aundh",
-  "Kalyani Nagar",
-  "Katraj"
+const AHILYANAGAR_AREAS = [
+  "All Ahilyanagar",
+  "Savedi",
+  "Kedgaon",
+  "Bhingar",
+  "Pipeline Road",
+  "Tarakpur",
+  "Delhi Gate",
+  "Maliwada",
+  "Nagapur MIDC",
+  "Kotla",
+  "Burudgaon Road",
+  "Bolhegaon",
+  "DSP Chowk",
+  "Gulshanabad"
 ];
 
 export default function CommunityFeedPage({ onNavigateTrack }) {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedArea, setSelectedArea] = useState("All Pune");
+  const [selectedArea, setSelectedArea] = useState("All Ahilyanagar");
   const [filterType, setFilterType] = useState("all"); // 'all', 'trending', 'resolved'
   const [searchQuery, setSearchQuery] = useState("");
   const [upvotedIds, setUpvotedIds] = useState({});
@@ -71,7 +72,7 @@ export default function CommunityFeedPage({ onNavigateTrack }) {
 
   const filtered = useMemo(() => {
     return complaints.filter(c => {
-      if (selectedArea !== "All Pune") {
+      if (selectedArea !== "All Ahilyanagar") {
         const locLower = (c.location || "").toLowerCase();
         if (!locLower.includes(selectedArea.toLowerCase())) return false;
       }
@@ -103,7 +104,7 @@ export default function CommunityFeedPage({ onNavigateTrack }) {
             Neighborhood Pulse
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#9CA3AF] mt-1">
-            See what civic issues are active around your locality in Pune. Endorse complaints with your vote to raise their municipal priority.
+            See what civic issues are active around your locality in Ahilyanagar. Endorse complaints with your vote to raise their municipal priority.
           </p>
         </div>
 
@@ -145,7 +146,7 @@ export default function CommunityFeedPage({ onNavigateTrack }) {
       {/* Filter Chips by Locality */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
         <span className="text-[#6B7280] dark:text-[#9CA3AF] shrink-0 font-medium text-[11px]">Area:</span>
-        {PUNE_AREAS.map((area) => (
+        {AHILYANAGAR_AREAS.map((area) => (
           <button
             key={area}
             onClick={() => setSelectedArea(area)}

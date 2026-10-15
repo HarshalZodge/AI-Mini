@@ -67,7 +67,7 @@ export default function Navbar({
               animate={{ opacity: 1, y: 0 }}
               className="text-[10px] -mt-1 font-medium text-[#6B7280] dark:text-[#9CA3AF]"
             >
-              {isManagement ? 'PMC Management Suite' : 'Citizen Grievance Redressal'}
+              {isManagement ? 'AMC Management Suite' : 'Citizen Grievance Redressal'}
             </motion.span>
           </div>
         </div>
@@ -193,7 +193,7 @@ export default function Navbar({
           >
             <ArrowRightLeft className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">
-              {isManagement ? 'Switch to Citizen Portal' : 'Switch to PMC Management'}
+              {isManagement ? 'Switch to Citizen Portal' : 'Switch to AMC Management'}
             </span>
             <span className="sm:hidden">
               {isManagement ? 'Citizen' : 'Officer'}

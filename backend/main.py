@@ -170,7 +170,7 @@ def update_complaint_status(
     if not timeline or len(timeline) != 4:
         # Default scaffold if missing
         labels = [
-            ("Submitted", "Grievance Registered", "Complaint logged in PMC civic tracking database."),
+            ("Submitted", "Grievance Registered", "Complaint logged in AMC civic tracking database."),
             ("Assigned", "Assigned to Ward Department", f"Routed to {complaint.department}."),
             ("In Progress", "Field Inspection & Remediation", "Field staff allocated and remedial works initiated."),
             ("Resolved", "Resolved & Verified", "Issue rectified on site and verified by ward supervisor.")
@@ -306,7 +306,7 @@ def get_insights(db: Session = Depends(get_db)):
     # Generate summary & recommendations via Gemini if connected or analytical heuristic
     top_cat_name = sorted_cats[0][0] if sorted_cats else "Roads & Potholes"
     second_cat_name = sorted_cats[1][0] if len(sorted_cats) > 1 else "Sanitation & Garbage"
-    top_loc = hotspots[0] if hotspots else "Kothrud"
+    top_loc = hotspots[0] if hotspots else "Savedi"
 
     summary = (
         f"Weekly municipal grievance intake indicates {len(all_complaints)} active cases. "
@@ -317,7 +317,7 @@ def get_insights(db: Session = Depends(get_db)):
 
     recommendations = [
         f"Deploy rapid mobile asphalt patch team to high-complaint corridors in {top_loc} to preempt monsoon erosion.",
-        f"Reinforce twice-daily waste clearance and spot fines in commercial clusters around Hinjawadi and Baner.",
+        f"Reinforce twice-daily waste clearance and spot fines in commercial clusters around Pipeline Road and Savedi.",
         "Institute preventive electrical junction box sealing ahead of impending storm forecasts to eliminate live wire hazards."
     ]
 
@@ -340,7 +340,7 @@ def reseed_endpoint():
 @app.get("/api/management/stats")
 def get_management_stats(db: Session = Depends(get_db)):
     """
-    Comprehensive administrative telemetry for PMC Management Portal:
+    Comprehensive administrative telemetry for AMC Management Portal:
     Departmental SLA ranking, overdue risk alerts, and workload distribution.
     """
     complaints = db.query(Complaint).all()
@@ -449,7 +449,7 @@ def generate_work_order(
 ):
     """
     Management Portal endpoint:
-    Issues an official PMC Municipal Contractor Dispatch Work Order.
+    Issues an official AMC Municipal Contractor Dispatch Work Order.
     Advances grievance status to 'In Progress' and updates lifecycle timeline.
     """
     complaint = None
@@ -462,7 +462,7 @@ def generate_work_order(
         raise HTTPException(status_code=404, detail="Complaint not found")
 
     now = datetime.now(timezone.utc)
-    work_order_id = f"WO-PMC-2026-{complaint.id:04d}"
+    work_order_id = f"WO-AMC-2026-{complaint.id:04d}"
     deadline_date = (now + timedelta(days=2)).strftime("%d %B %Y")
     issued_date = now.strftime("%d %B %Y, %I:%M %p")
 
@@ -471,7 +471,7 @@ def generate_work_order(
     materials_formatted = "\n".join([f"  • {m}" for m in materials_list])
 
     docket = f"""================================================================================
-PUNE MUNICIPAL CORPORATION — DIVISIONAL GRIEVANCE REDRESSAL WING
+AHILYANAGAR MUNICIPAL CORPORATION — DIVISIONAL GRIEVANCE REDRESSAL WING
 OFFICIAL MUNICIPAL WORK ORDER & CONTRACTOR DISPATCH DOCKET
 ================================================================================
 Work Order ID    : {work_order_id}
@@ -484,7 +484,7 @@ Priority Rating  : Level {complaint.priority}/5 [{'EMERGENCY RAPID DISPATCH' if 
 
 SITE & GRIEVANCE LOCATION:
   Address        : {complaint.location}
-  City / Zone    : Pune Municipal Corporation
+  City / Zone    : Ahilyanagar Municipal Corporation
   Category       : {complaint.category} ({complaint.sub_issue or 'Standard Issue'})
   Description    : {complaint.description}
 
@@ -495,7 +495,7 @@ OFFICER & CONTRACTOR ASSIGNMENT:
 SAFETY DIRECTIVES & SCOPE OF REMEDIATION:
   1. Priority Instructions: {payload.priority_instructions}
   2. The assigned team must erect high-visibility safety barriers immediately upon arrival.
-  3. Digital photographic evidence (Before & After) must be uploaded to the PMC portal for citizen verification.
+  3. Digital photographic evidence (Before & After) must be uploaded to the AMC portal for citizen verification.
 
 REQUISITIONED TOOLS & MATERIALS:
 {materials_formatted}

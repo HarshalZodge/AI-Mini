@@ -27,7 +27,7 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
   const [workOrderModalOpen, setWorkOrderModalOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [assignedOfficer, setAssignedOfficer] = useState('Er. S. Patil (Junior Engineer)');
-  const [contractor, setContractor] = useState('M/s Pune Municipal Rapid Infra Works');
+  const [contractor, setContractor] = useState('M/s Ahilyanagar Municipal Rapid Infra Works');
   const [instructions, setInstructions] = useState('Deploy field team and set up high-visibility barriers within 4 hours.');
   const [materials, setMaterials] = useState(['Cold Asphalt Mix', 'Safety Barricades', 'Reflective Caution Tape']);
   const [issuedDocket, setIssuedDocket] = useState(null);
@@ -96,7 +96,7 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111111] dark:bg-[#27272A] text-white text-xs font-semibold mb-2">
             <Building2 className="w-3.5 h-3.5 text-[#F2A33A]" />
-            <span>Pune Municipal Corporation • Administrative Portal</span>
+            <span>Ahilyanagar Municipal Corporation • Administrative Portal</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111111] dark:text-[#F4F4F5] tracking-tight">
             Grievance Redressal Command Center
@@ -262,7 +262,7 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
         <div className="bg-[#FFFFFF] dark:bg-[#17171A] rounded-2xl border border-[#ECECE8] dark:border-[#27272A] p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-[#ECECE8] dark:border-[#27272A]">
             <h3 className="font-semibold text-sm text-[#111111] dark:text-[#F4F4F5]">
-              PMC Departments Ranked by SLA On-Time Adherence
+              AMC Departments Ranked by SLA On-Time Adherence
             </h3>
             <span className="text-xs text-[#6B7280] dark:text-[#9CA3AF]">
               Performance Benchmark: &ge;85%

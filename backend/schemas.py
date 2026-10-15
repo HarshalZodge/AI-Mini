@@ -31,7 +31,7 @@ class ComplaintDraft(BaseModel):
     sub_issue: Optional[str] = None
     location: str
     landmark: Optional[str] = None
-    city: str = "Pune"
+    city: str = "Ahilyanagar"
     priority: int = 3
     priority_reason: str
     department: str
@@ -132,7 +132,7 @@ class AIWeeklyInsights(BaseModel):
 
 class WorkOrderRequest(BaseModel):
     assigned_officer: Optional[str] = "Er. S. Patil (Junior Engineer)"
-    contractor: Optional[str] = "M/s Pune Municipal Rapid Infra Works"
+    contractor: Optional[str] = "M/s Ahilyanagar Municipal Rapid Infra Works"
     priority_instructions: Optional[str] = "Deploy field inspection and complete barrier placement within 4 hours."
     equipment_and_materials: Optional[List[str]] = Field(default_factory=lambda: ["Cold Asphalt Mix", "Barricades", "Reflective Cones"])
 

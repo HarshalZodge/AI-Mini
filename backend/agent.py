@@ -57,7 +57,7 @@ if GEMINI_API_KEY and GEMINI_API_KEY != "your_gemini_api_key_here":
 # =============================================================================
 # SECTION 1: SYSTEM PROMPT & FUNCTION DEFINITIONS
 # =============================================================================
-SYSTEM_PROMPT = """You are CivicResolve, an empathetic, highly competent, and polite AI Civic Grievance Redressal Agent for Pune Municipal Corporation (PMC).
+SYSTEM_PROMPT = """You are CivicResolve, an empathetic, highly competent, and polite AI Civic Grievance Redressal Agent for Ahilyanagar Municipal Corporation (AMC).
 Your mission is to help citizens register, structure, and track municipal complaints smoothly.
 
 Languages:
@@ -66,11 +66,11 @@ Languages:
 Core Guidelines:
 1. Active Listening & Clarification:
    - If the user provides sufficient details (issue and location), proceed immediately with tool use.
-   - If the issue description is very vague or lacks location/neighborhood in Pune, ask AT MOST 1 or 2 brief, polite follow-up questions (e.g. asking for the exact area/landmark or how long the issue has persisted). Never interrogate or ask more than 2 follow-ups.
+   - If the issue description is very vague or lacks location/neighborhood in Ahilyanagar, ask AT MOST 1 or 2 brief, polite follow-up questions (e.g. asking for the exact area/landmark like Savedi, Kedgaon, Bhingar, Tarakpur, or how long the issue has persisted). Never interrogate or ask more than 2 follow-ups.
 2. Tool Execution Workflow:
    - When an issue and location are identified, call the following tools:
      a) classify_complaint: determine standard category and sub-issue.
-     b) find_department: match to official PMC department and SLA (never invent authority names).
+     b) find_department: match to official AMC department and SLA (never invent authority names).
      c) score_priority: compute 1-5 severity based on hazards (open manholes, live wires, hospitals, traffic).
      d) check_duplicates: check if nearby citizens have already reported this issue.
      e) generate_formal_letter: draft a polite, rigorous official letter to the authority.
@@ -89,7 +89,7 @@ def classify_complaint_tool(text: str) -> dict:
     return tools.classify_complaint(text)
 
 
-def find_department_tool(category: str, city: str = "Pune") -> dict:
+def find_department_tool(category: str, city: str = "Ahilyanagar") -> dict:
     """Finds official municipal department, authority designation, and SLA days."""
     return tools.find_department(category, city)
 
@@ -115,7 +115,7 @@ def is_confirmation_intent(text: str) -> bool:
 
 
 def extract_location(text: str, history: List[Any]) -> Optional[str]:
-    """Finds Pune neighborhood in text or history."""
+    """Finds Ahilyanagar neighborhood in text or history."""
     history_texts = []
     for h in history:
         if isinstance(h, dict):
@@ -123,7 +123,7 @@ def extract_location(text: str, history: List[Any]) -> Optional[str]:
         elif hasattr(h, "content"):
             history_texts.append(h.content)
     all_text = " ".join(history_texts + [text]).lower()
-    for hood in tools.PUNE_NEIGHBORHOODS.keys():
+    for hood in tools.AHILYANAGAR_NEIGHBORHOODS.keys():
         if hood in all_text:
             return hood.title()
     # Check for general location patterns like "near X", "at X", "in X"
@@ -326,7 +326,7 @@ class CivicAgent:
         # If location is still missing and user didn't mention it, ask follow-up
         if not detected_loc and len(history) < 2:
             return {
-                "reply": "Thank you for reaching out. To accurately route this grievance to the correct Pune Municipal Corporation ward office, could you please specify the exact location or neighborhood (e.g., Kothrud, Baner, Hinjawadi, Shivajinagar)?",
+                "reply": "Thank you for reaching out. To accurately route this grievance to the correct Ahilyanagar Municipal Corporation ward office, could you please specify the exact location or neighborhood (e.g., Savedi, Kedgaon, Bhingar, Tarakpur, Delhi Gate)?",
                 "agent_steps": agent_steps,
                 "complaint_draft": None,
                 "submitted_complaint": None,
@@ -336,7 +336,7 @@ class CivicAgent:
             }
 
         # Generate formal letter
-        final_loc = detected_loc or "Pune City"
+        final_loc = detected_loc or "Ahilyanagar"
         formal_letter = tools.generate_formal_letter({
             "category": classified_category,
             "sub_issue": sub_issue,
@@ -442,10 +442,10 @@ class CivicAgent:
                 tool_name="evaluate_completeness",
                 status="completed",
                 details={"missing": "location"},
-                summary="Missing specific Pune neighborhood/locality for ward assignment."
+                summary="Missing specific Ahilyanagar neighborhood/locality for ward assignment."
             ))
             return {
-                "reply": "Thank you for reporting this issue. To direct this to the correct PMC Ward Office and field engineers, could you please mention the area or street in Pune where this is located (e.g., Kothrud, Baner, Hinjawadi, Shivajinagar)?",
+                "reply": "Thank you for reporting this issue. To direct this to the correct AMC Ward Office and field engineers, could you please mention the area or street in Ahilyanagar where this is located (e.g., Savedi, Kedgaon, Bhingar, Tarakpur, Delhi Gate)?",
                 "agent_steps": [s.model_dump() for s in agent_steps],
                 "complaint_draft": None,
                 "submitted_complaint": None,
@@ -454,7 +454,7 @@ class CivicAgent:
                 "ready_for_submission": False,
             }
 
-        final_loc = detected_loc or "Pune Central"
+        final_loc = detected_loc or "Ahilyanagar Central"
 
         # 5. Check Duplicates
         duplicate_match = None
@@ -554,7 +554,7 @@ class CivicAgent:
         """
         # Reconstruct draft from previous bot context
         full_text = " ".join([h.get("content", "") for h in history])
-        location = extract_location(full_text, []) or "Pune"
+        location = extract_location(full_text, []) or "Ahilyanagar"
         classification = tools.classify_complaint(full_text)
         dept_info = tools.find_department(classification["category"])
         priority_info = tools.score_priority(full_text, classification["category"])
@@ -583,7 +583,7 @@ class CivicAgent:
             "category": classification["category"],
             "sub_issue": classification["sub_issue"],
             "location": location,
-            "city": "Pune",
+            "city": "Ahilyanagar",
             "priority": priority_info["score"],
             "priority_reason": priority_info["reason"],
             "formal_letter": formal_letter

@@ -39,7 +39,7 @@ class Complaint(Base):
     sub_issue = Column(String(100), nullable=True)
     location = Column(String(255), nullable=False)
     landmark = Column(String(255), nullable=True)
-    city = Column(String(100), default="Pune")
+    city = Column(String(100), default="Ahilyanagar")
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     priority = Column(Integer, default=3)  # 1 to 5
