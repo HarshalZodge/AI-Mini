@@ -116,7 +116,13 @@ def is_confirmation_intent(text: str) -> bool:
 
 def extract_location(text: str, history: List[Any]) -> Optional[str]:
     """Finds Pune neighborhood in text or history."""
-    all_text = " ".join([h.content for h in history] + [text]).lower()
+    history_texts = []
+    for h in history:
+        if isinstance(h, dict):
+            history_texts.append(h.get("content", ""))
+        elif hasattr(h, "content"):
+            history_texts.append(h.content)
+    all_text = " ".join(history_texts + [text]).lower()
     for hood in tools.PUNE_NEIGHBORHOODS.keys():
         if hood in all_text:
             return hood.title()
