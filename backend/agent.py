@@ -170,7 +170,8 @@ class CivicAgent:
                 last_bot_msg = h.get("content", "")
                 break
 
-        has_pending_confirmation = any(k in last_bot_msg.lower() for k in ["confirm", "summary", "draft", "submit", "letter"])
+        confirmation_triggers = ["confirm", "summary", "draft", "submit", "letter", "file", "proceed", "review", "notice", "grievance", "complaint"]
+        has_pending_confirmation = (len(history) >= 2) and (any(k in last_bot_msg.lower() for k in confirmation_triggers) or len(history) >= 2)
 
         # Check if user confirms
         if has_pending_confirmation and is_confirmation_intent(user_message):

@@ -14,7 +14,13 @@ import {
   FileText,
   Printer,
   X,
-  Check
+  Check,
+  Inbox,
+  Search,
+  Filter,
+  ArrowUpRight,
+  MapPin,
+  Tag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchManagementStats, updateComplaintStatus, createWorkOrder, fetchComplaints } from '../lib/api';
@@ -22,8 +28,11 @@ import FormalLetterModal from '../components/FormalLetterModal';
 
 export default function ManagementCommandCenterPage({ onNavigateTrack }) {
   const [statsData, setStatsData] = useState(null);
+  const [allComplaints, setAllComplaints] = useState([]);
+  const [intakeFilter, setIntakeFilter] = useState('all');
+  const [intakeSearch, setIntakeSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('radar'); // 'radar', 'departments', 'workorders'
+  const [activeTab, setActiveTab] = useState('all_reports'); // 'all_reports', 'radar', 'departments'
   const [workOrderModalOpen, setWorkOrderModalOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [assignedOfficer, setAssignedOfficer] = useState('Er. S. Patil (Junior Engineer)');
@@ -36,8 +45,12 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const data = await fetchManagementStats();
-      setStatsData(data);
+      const [stats, complaintsList] = await Promise.all([
+        fetchManagementStats(),
+        fetchComplaints({ sortBy: 'created_at' })
+      ]);
+      setStatsData(stats);
+      setAllComplaints(complaintsList || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -89,6 +102,20 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
   const nearDeadline = statsData?.near_deadline || [];
   const deptPerformance = statsData?.department_performance || [];
 
+  const filteredIntake = allComplaints.filter(c => {
+    if (intakeFilter !== 'all' && c.status !== intakeFilter) return false;
+    if (intakeSearch.trim()) {
+      const q = intakeSearch.toLowerCase();
+      return (
+        c.title?.toLowerCase().includes(q) ||
+        c.location?.toLowerCase().includes(q) ||
+        c.tracking_id?.toLowerCase().includes(q) ||
+        c.category?.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
   return (
     <div className="max-w-[1100px] mx-auto px-4 sm:px-6 py-8 min-h-[calc(100vh-4rem)] space-y-8">
       {/* Official Management Header */}
@@ -102,7 +129,7 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
             Grievance Redressal Command Center
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#9CA3AF] mt-1">
-            Ward Officer & Field Engineering Command: SLA Breach Radar, Work Order Dispatch, and Contractor Management.
+            Ward Officer & Field Engineering Command: Citizen Report Influx, SLA Breach Radar, Work Order Dispatch, and Contractor Management.
           </p>
         </div>
 
@@ -143,20 +170,32 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
           </div>
 
           <div className="p-5 rounded-2xl bg-[#FFFFFF] dark:bg-[#17171A] border border-[#ECECE8] dark:border-[#27272A] shadow-xs">
-            <span className="text-xs font-medium text-[#6B7280] dark:text-[#9CA3AF]">High Risk Hazards (P4-5)</span>
-            <p className="text-2xl sm:text-3xl font-extrabold text-[#F2A33A] mt-1 tracking-tight">
-              {summary.high_risk_count}
+            <span className="text-xs font-medium text-[#6B7280] dark:text-[#9CA3AF]">Total Citizen Intake</span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-[#111111] dark:text-[#F4F4F5] mt-1 tracking-tight">
+              {allComplaints.length}
             </p>
-            <span className="text-[11px] text-[#F2A33A] mt-0.5 inline-block">Open Life-Safety Risks</span>
+            <span className="text-[11px] text-[#6B7280] dark:text-[#9CA3AF] mt-0.5 inline-block">All Active & Filed Grievances</span>
           </div>
         </div>
       )}
 
       {/* Sub-navigation tabs */}
-      <div className="flex items-center gap-2 border-b border-[#ECECE8] dark:border-[#27272A] pb-3 text-xs sm:text-sm">
+      <div className="flex items-center gap-2 border-b border-[#ECECE8] dark:border-[#27272A] pb-3 text-xs sm:text-sm overflow-x-auto no-scrollbar">
+        <button
+          onClick={() => setActiveTab('all_reports')}
+          className={`flex items-center gap-2 pb-2 font-semibold border-b-2 shrink-0 transition-all ${
+            activeTab === 'all_reports'
+              ? 'border-[#5B5BD6] text-[#5B5BD6] dark:text-[#8383FF]'
+              : 'border-transparent text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111]'
+          }`}
+        >
+          <Inbox className="w-4 h-4 text-[#34A874]" />
+          <span>All Citizen Reports ({allComplaints.length})</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('radar')}
-          className={`flex items-center gap-2 pb-2 font-semibold border-b-2 transition-all ${
+          className={`flex items-center gap-2 pb-2 font-semibold border-b-2 shrink-0 transition-all ml-3 ${
             activeTab === 'radar'
               ? 'border-[#5B5BD6] text-[#5B5BD6] dark:text-[#8383FF]'
               : 'border-transparent text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111]'
@@ -168,7 +207,7 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
 
         <button
           onClick={() => setActiveTab('departments')}
-          className={`flex items-center gap-2 pb-2 font-semibold border-b-2 transition-all ml-4 ${
+          className={`flex items-center gap-2 pb-2 font-semibold border-b-2 shrink-0 transition-all ml-3 ${
             activeTab === 'departments'
               ? 'border-[#5B5BD6] text-[#5B5BD6] dark:text-[#8383FF]'
               : 'border-transparent text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111]'
@@ -178,6 +217,160 @@ export default function ManagementCommandCenterPage({ onNavigateTrack }) {
           <span>Department Performance Rankings</span>
         </button>
       </div>
+
+      {/* TAB 0: All Citizen Reports Stream (Live Influx) */}
+      {activeTab === 'all_reports' && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFFFF] dark:bg-[#17171A] p-4 rounded-xl border border-[#ECECE8] dark:border-[#27272A] shadow-xs">
+            {/* Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
+              {[
+                { id: 'all', label: 'All Cases', count: allComplaints.length },
+                { id: 'Submitted', label: 'Newly Submitted', count: allComplaints.filter(c => c.status === 'Submitted').length },
+                { id: 'Assigned', label: 'Assigned', count: allComplaints.filter(c => c.status === 'Assigned').length },
+                { id: 'In Progress', label: 'In Progress', count: allComplaints.filter(c => c.status === 'In Progress').length },
+                { id: 'Resolved', label: 'Resolved', count: allComplaints.filter(c => c.status === 'Resolved').length },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setIntakeFilter(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+                    intakeFilter === tab.id
+                      ? 'bg-[#5B5BD6] text-white shadow-xs'
+                      : 'bg-[#FAFAF8] dark:bg-[#131316] text-[#6B7280] dark:text-[#9CA3AF] hover:text-[#111111] dark:hover:text-[#F4F4F5]'
+                  }`}
+                >
+                  {tab.label} ({tab.count})
+                </button>
+              ))}
+            </div>
+
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64">
+              <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={intakeSearch}
+                onChange={(e) => setIntakeSearch(e.target.value)}
+                placeholder="Search citizen reports..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#ECECE8] dark:border-[#27272A] bg-[#FAFAF8] dark:bg-[#131316] text-[#111111] dark:text-[#F4F4F5] focus:outline-hidden focus:ring-1 focus:ring-[#5B5BD6]"
+              />
+            </div>
+          </div>
+
+          {/* Grievance Feed Cards */}
+          <div className="grid grid-cols-1 gap-3.5">
+            {filteredIntake.length === 0 ? (
+              <div className="text-center py-12 bg-[#FFFFFF] dark:bg-[#17171A] rounded-2xl border border-[#ECECE8] dark:border-[#27272A] p-6 text-sm text-[#6B7280]">
+                No grievances match this filter criteria.
+              </div>
+            ) : (
+              filteredIntake.map((item) => (
+                <div
+                  key={item.tracking_id}
+                  className="bg-[#FFFFFF] dark:bg-[#17171A] rounded-2xl border border-[#ECECE8] dark:border-[#27272A] p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-[#5B5BD6]/40 transition-colors"
+                >
+                  <div className="space-y-1.5 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-[#5B5BD6] dark:text-[#8383FF] bg-[#EEF0FF] dark:bg-[#1C1C30] px-2 py-0.5 rounded">
+                        {item.tracking_id}
+                      </span>
+
+                      {/* Status Pill */}
+                      <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${
+                        item.status === 'Resolved'
+                          ? 'bg-[#EBF8F2] text-[#34A874] border-[#34A874]/30'
+                          : item.status === 'In Progress'
+                          ? 'bg-[#EEF0FF] text-[#5B5BD6] border-[#5B5BD6]/30'
+                          : item.status === 'Assigned'
+                          ? 'bg-[#F3E8FF] text-[#9333EA] border-[#9333EA]/30'
+                          : 'bg-[#FEF3C7] text-[#D97706] border-[#D97706]/30'
+                      }`}>
+                        ● {item.status}
+                      </span>
+
+                      {/* Priority Badge */}
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                        item.priority >= 4
+                          ? 'bg-[#FFF5F5] text-[#E5484D] border border-[#E5484D]/30'
+                          : item.priority === 3
+                          ? 'bg-[#FFFBEB] text-[#D97706] border border-[#D97706]/30'
+                          : 'bg-[#F0FDF4] text-[#16A34A] border border-[#16A34A]/30'
+                      }`}>
+                        Priority {item.priority}/5
+                      </span>
+
+                      <span className="text-[11px] text-[#6B7280] dark:text-[#9CA3AF] flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        Target: {item.expected_resolution_days || 3} days
+                      </span>
+
+                      {item.escalated && (
+                        <span className="text-[10px] bg-[#E5484D] text-white px-2 py-0.2 rounded font-bold">
+                          ESCALATED
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="font-semibold text-sm text-[#111111] dark:text-[#F4F4F5]">
+                      {item.title}
+                    </h3>
+
+                    <p className="text-xs text-[#6B7280] dark:text-[#9CA3AF] line-clamp-2">
+                      {item.description}
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-[#6B7280] dark:text-[#9CA3AF] pt-1">
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-[#5B5BD6]" />
+                        {item.location}
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <Building2 className="w-3.5 h-3.5" />
+                        {item.department}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Quick Action Controls */}
+                  <div className="flex items-center gap-2 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#ECECE8] dark:border-[#27272A]">
+                    {item.status !== 'Resolved' && (
+                      <button
+                        onClick={() => handleOpenDispatchModal(item)}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-[#5B5BD6] text-white hover:bg-[#4848BD] shadow-2xs transition-all"
+                        title="Generate official contractor work order"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Dispatch Work Order</span>
+                      </button>
+                    )}
+
+                    {item.status !== 'Resolved' && (
+                      <button
+                        onClick={() => handleQuickResolve(item.tracking_id)}
+                        className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-medium border border-[#ECECE8] dark:border-[#27272A] hover:bg-[#EBF8F2] hover:text-[#34A874] text-[#374151] dark:text-[#D1D5DB] transition-all"
+                        title="Mark issue resolved"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Verify & Close</span>
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => onNavigateTrack(item.tracking_id)}
+                      className="p-2 rounded-xl border border-[#ECECE8] dark:border-[#27272A] text-[#6B7280] hover:text-[#5B5BD6] hover:bg-[#F4F4F2] dark:hover:bg-[#202024] transition-colors"
+                      title="View full lifecycle track & letter"
+                    >
+                      <ArrowUpRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* TAB 1: SLA Breach Radar & Urgent Action Dispatch */}
       {activeTab === 'radar' && (
