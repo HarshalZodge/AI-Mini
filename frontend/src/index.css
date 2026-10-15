@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #FAFAF8;
+    --bg-surface: #FFFFFF;
+    --text-primary: #111111;
+    --text-muted: #6B7280;
+    --border-color: #ECECE8;
+    --accent: #5B5BD6;
+    --accent-tint: #EEF0FF;
+    --accent-hover: #4848BD;
+    --priority-green: #34A874;
+    --priority-amber: #F2A33A;
+    --priority-red: #E5484D;
+  }
+
+  .dark {
+    --bg-main: #0F0F10;
+    --bg-surface: #17171A;
+    --text-primary: #F4F4F5;
+    --text-muted: #9CA3AF;
+    --border-color: #27272A;
+    --accent: #6E6EF7;
+    --accent-tint: #1C1C30;
+    --accent-hover: #8383FF;
+    --priority-green: #34A874;
+    --priority-amber: #F2A33A;
+    --priority-red: #E5484D;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  code, pre {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom shimmer animation for tool calling steps */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(91, 91, 214, 0.05) 0%, rgba(91, 91, 214, 0.15) 50%, rgba(91, 91, 214, 0.05) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+.dark .animate-shimmer {
+  background: linear-gradient(90deg, rgba(110, 110, 247, 0.04) 0%, rgba(110, 110, 247, 0.12) 50%, rgba(110, 110, 247, 0.04) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+/* Checkmark draw animation for success */
+@keyframes stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-check {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: stroke-draw 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+/* Print styles for window.print() of formal letter */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-letter, .printable-letter * {
+    visibility: visible;
+  }
+  .printable-letter {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 2.5cm;
+    color: #000;
+    background: #fff;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Leaflet Map overrides for clean minimal aesthetic */
+.leaflet-container {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  border-radius: 1rem;
+  z-index: 10;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+.dark .leaflet-popup-content-wrapper {
+  background-color: #17171A !important;
+  color: #F4F4F5 !important;
+  border: 1px solid #27272A;
+}
+.dark .leaflet-popup-tip {
+  background-color: #17171A !important;
+}
